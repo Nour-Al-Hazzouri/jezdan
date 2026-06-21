@@ -151,3 +151,24 @@ export function getExchangeRate() {
 export function setExchangeRate(rate) {
   writeData(KEYS.EXCHANGE_RATE, Number(rate));
 }
+
+export function exportData() {
+  return {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    transactions: getTransactions(),
+    openingBalances: getOpeningBalances(),
+    balances: getBalances(),
+  };
+}
+
+export function importData(json) {
+  if (!json || !Array.isArray(json.transactions)) {
+    throw new Error("Invalid backup file.");
+  }
+  // Full replace: wipe then restore
+  writeData(KEYS.TRANSACTIONS, json.transactions);
+  writeData(KEYS.OPENING_BALANCES, json.openingBalances || { usd: 0, lbp: 0 });
+  // Recalculate from scratch to ensure balances are consistent
+  recalculateBalances();
+}

@@ -193,6 +193,10 @@ dialog h2 {
   font-size: 0.9rem;
   cursor: pointer;
   min-width: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   transition: opacity var(--transition);
 }
 .currency-toggle:hover {

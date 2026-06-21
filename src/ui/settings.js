@@ -1,4 +1,9 @@
-import { getOpeningBalances, setOpeningBalances } from "../data/storage.js";
+import {
+  getOpeningBalances,
+  setOpeningBalances,
+  exportData,
+  importData,
+} from "../data/storage.js";
 import { renderDashboard } from "./dashboard.js";
 
 export function initSettingsUI() {
@@ -9,6 +14,10 @@ export function initSettingsUI() {
 
   const inputUsd = document.getElementById("setting-open-usd");
   const inputLbp = document.getElementById("setting-open-lbp");
+
+  const btnExport = document.getElementById("btn-export-data");
+  const btnImport = document.getElementById("btn-import-data");
+  const fileInput = document.getElementById("import-file-input");
 
   if (!dialog || !btnOpen || !btnClose || !form) return;
 
@@ -26,8 +35,53 @@ export function initSettingsUI() {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     setOpeningBalances(inputUsd.value, inputLbp.value);
-
     dialog.close();
     renderDashboard();
+  });
+
+  // ── Export ──
+  btnExport.addEventListener("click", () => {
+    const data = exportData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const date = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `jezdan-backup-${date}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // ── Import ──
+  btnImport.addEventListener("click", () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const json = JSON.parse(e.target.result);
+        const confirmed = window.confirm(
+          `This will replace ALL current data with the backup from ${json.exportedAt || "unknown date"}.\n\nAre you sure?`,
+        );
+        if (!confirmed) return;
+        importData(json);
+        dialog.close();
+        renderDashboard();
+      } catch {
+        alert(
+          "Failed to read backup file. Make sure it is a valid Jezdan backup.",
+        );
+      } finally {
+        fileInput.value = ""; // reset so the same file can be re-picked
+      }
+    };
+    reader.readAsText(file);
   });
 }
