@@ -1,4 +1,4 @@
-import { addTransaction, getBalances } from "../data/storage.js";
+import { addTransaction, updateTransaction } from "../data/storage.js";
 import { renderDashboard } from "./dashboard.js";
 
 export function initAddTransactionUI() {
@@ -12,6 +12,8 @@ export function initAddTransactionUI() {
 
   const btnAddPaid = document.getElementById("btn-add-paid-row");
   const btnAddReceived = document.getElementById("btn-add-received-row");
+
+  let editingTx = null;
 
   // Load last used currency
   const getLastCurrency = () =>
@@ -27,7 +29,7 @@ export function initAddTransactionUI() {
     setLastCurrency(next);
   }
 
-  function createRow(defaultCurrency, isRequired = false) {
+  function createRow(defaultCurrency, isRequired = false, defaultAmount = "") {
     const row = document.createElement("div");
     row.className = "amount-row";
 
@@ -39,6 +41,7 @@ export function initAddTransactionUI() {
     input.step = "any";
     input.min = "0";
     if (isRequired) input.required = true;
+    if (defaultAmount !== "") input.value = defaultAmount;
 
     const btn = document.createElement("button");
     btn.type = "button";
@@ -66,6 +69,7 @@ export function initAddTransactionUI() {
   }
 
   btnOpen.addEventListener("click", () => {
+    editingTx = null;
     resetForm();
     dialog.showModal();
     // Focus the first input for fast interaction
@@ -123,14 +127,55 @@ export function initAddTransactionUI() {
       return; // Form validation should catch this, but just in case
     }
 
-    addTransaction({
-      paid,
-      receivedChange,
-      note,
-      timestamp: Date.now(),
-    });
+    if (editingTx) {
+      updateTransaction(editingTx.id, {
+        ...editingTx,
+        paid,
+        receivedChange,
+        note,
+      });
+    } else {
+      addTransaction({
+        paid,
+        receivedChange,
+        note,
+        timestamp: Date.now(),
+      });
+    }
 
     dialog.close();
     renderDashboard();
   });
+
+  // Expose edit function to the window or as a callback
+  window.openEditTransaction = (tx) => {
+    editingTx = tx;
+    form.reset();
+    paidRowsContainer.innerHTML = "";
+    receivedRowsContainer.innerHTML = "";
+
+    if (tx.paid && tx.paid.length > 0) {
+      tx.paid.forEach((p) =>
+        paidRowsContainer.appendChild(createRow(p.currency, true, p.amount)),
+      );
+    } else {
+      paidRowsContainer.appendChild(createRow(null, true));
+    }
+    btnAddPaid.style.display =
+      paidRowsContainer.children.length < 2 ? "inline-block" : "none";
+
+    if (tx.receivedChange && tx.receivedChange.length > 0) {
+      tx.receivedChange.forEach((r) =>
+        receivedRowsContainer.appendChild(
+          createRow(r.currency, false, r.amount),
+        ),
+      );
+    }
+    btnAddReceived.style.display =
+      receivedRowsContainer.children.length < 2 ? "inline-block" : "none";
+
+    document.getElementById("tx-note").value = tx.note || "";
+
+    dialog.showModal();
+  };
 }

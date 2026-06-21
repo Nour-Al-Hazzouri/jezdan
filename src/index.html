@@ -34,10 +34,23 @@
 
         <section class="recent-transactions">
           <h3>Recent Transactions</h3>
-          <ul id="recent-tx-list">
+          <ul id="recent-tx-list" class="tx-list">
             <!-- Transactions populated via JS -->
             <li class="empty-state">No transactions yet</li>
           </ul>
+          <button
+            type="button"
+            id="btn-open-history"
+            class="btn-text"
+            style="
+              display: none;
+              width: 100%;
+              text-align: center;
+              margin-top: 1rem;
+            "
+          >
+            View All History
+          </button>
         </section>
       </main>
 
@@ -81,6 +94,18 @@
             </button>
           </div>
         </form>
+      </dialog>
+
+      <dialog id="history-dialog" class="full-dialog">
+        <div class="dialog-header">
+          <h2>Transaction History</h2>
+          <button type="button" id="btn-close-history" class="btn-close">
+            &times;
+          </button>
+        </div>
+        <ul id="full-history-list" class="tx-list">
+          <!-- Populated by JS -->
+        </ul>
       </dialog>
     </div>
   </body>

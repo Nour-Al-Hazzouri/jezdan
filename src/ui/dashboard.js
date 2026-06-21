@@ -98,9 +98,18 @@ export function renderDashboard() {
         amountsDiv.appendChild(lbpSpan);
       }
 
-      li.appendChild(infoDiv);
-      li.appendChild(amountsDiv);
+      const headerDiv = document.createElement("div");
+      headerDiv.className = "tx-item-header";
+      headerDiv.appendChild(infoDiv);
+      headerDiv.appendChild(amountsDiv);
+
+      li.appendChild(headerDiv);
       elRecentTxList.appendChild(li);
     }
+  }
+
+  const btnOpenHistory = document.getElementById("btn-open-history");
+  if (btnOpenHistory) {
+    btnOpenHistory.style.display = txs.length > 0 ? "block" : "none";
   }
 }

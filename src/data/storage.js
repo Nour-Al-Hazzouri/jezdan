@@ -89,6 +89,42 @@ export function addTransaction(tx) {
   return newTx;
 }
 
+export function updateTransaction(id, updatedTx) {
+  let txs = getTransactions();
+  const oldTxIndex = txs.findIndex((t) => t.id === id);
+  if (oldTxIndex === -1) return null;
+
+  const oldTx = txs[oldTxIndex];
+  const netEffect = calculateNetEffect(
+    updatedTx.paid || [],
+    updatedTx.receivedChange || [],
+  );
+
+  const newTx = {
+    ...oldTx,
+    note: updatedTx.note !== undefined ? updatedTx.note : oldTx.note,
+    paid: updatedTx.paid || oldTx.paid,
+    receivedChange: updatedTx.receivedChange || oldTx.receivedChange,
+    type: updatedTx.type || oldTx.type,
+    netUSD: netEffect.USD || 0,
+    netLBP: netEffect.LBP || 0,
+  };
+
+  txs[oldTxIndex] = newTx;
+  writeData(KEYS.TRANSACTIONS, txs);
+
+  // Update balances by the difference
+  const diffUSD = newTx.netUSD - oldTx.netUSD;
+  const diffLBP = newTx.netLBP - oldTx.netLBP;
+
+  const balances = getBalances();
+  balances.usd += diffUSD;
+  balances.lbp += diffLBP;
+  writeData(KEYS.BALANCES, balances);
+
+  return newTx;
+}
+
 export function deleteTransaction(id) {
   let txs = getTransactions();
   const txToDelete = txs.find((t) => t.id === id);

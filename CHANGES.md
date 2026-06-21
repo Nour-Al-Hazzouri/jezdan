@@ -97,3 +97,22 @@ I have built the "Add Transaction" screen. It is currently accessible via a floa
 ### Plain English Summary
 
 I have built the main Dashboard for the Jezdan app. Now, when you open the app, you will immediately see your current balances for both USD and LBP in large, clear numbers. Below that, it shows an estimated total combining both currencies into a single USD amount. Finally, it displays a list of your 10 most recent transactions, showing the date, any notes you added, and the exact amounts paid or received. When you add a new transaction, the dashboard updates instantly without needing to reload the page.
+
+## [Task 5] Transaction History Screen
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Implemented the full transaction history screen with full support for deleting and editing past transactions, ensuring accurate balance rollbacks and updates.
+
+### Technical Log
+
+- **Modified**: `src/data/storage.js` - Added `updateTransaction(id, updatedTx)` to correctly calculate the net difference between an old and new transaction and apply that diff to the live balances.
+- **Modified**: `src/index.html` - Added a new `<dialog>` for the History view and a "View All History" trigger button on the dashboard.
+- **Modified**: `src/ui/styles.css` - Added styling for the full-screen history modal and the action buttons (Edit/Delete).
+- **Modified**: `src/ui/addTransaction.js` - Refactored to expose `openEditTransaction()`, which pre-fills the form with existing data, and modified the submit handler to call `updateTransaction()` if an edit is active.
+- **New**: `src/ui/history.js` - Created the rendering logic for the full scrollable history list and wired up the Edit and Delete button event handlers.
+- **Modified**: `src/index.js` - Initialized the history UI on application load.
+- **Why**: Fulfills Task 5 and the user's specific request to implement full Edit functionality, ensuring mistakes can be corrected without losing transaction chronological order, while maintaining mathematical correctness in the balances.
+
+### Plain English Summary
+
+I have built the "Transaction History" screen. You will now see a "View All History" button on the dashboard if you have transactions. Tapping it opens a full-screen scrollable list of everything you've recorded. Inside, each transaction now has an "Edit" and "Delete" button. Deleting a transaction safely rolls back your wallet balances. Editing a transaction re-opens the Add Transaction form pre-filled with your old data; when you save your changes, the app calculates the exact difference and correctly updates your wallet balances.
