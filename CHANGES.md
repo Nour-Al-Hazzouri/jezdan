@@ -1,5 +1,24 @@
 # Changes
 
+## [Backup & Import] Data Backup / Restore + Label Fix
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Added full JSON export/import for data backup, and fixed currency label alignment in the Settings dialog.
+
+### Technical Log
+
+- **Modified**: `src/ui/styles.css` - Added `display: flex; align-items: center; justify-content: center;` to `.currency-toggle` so static label spans center correctly inside `.amount-row`.
+- **Modified**: `src/data/storage.js` - Added `exportData()` (returns full snapshot: transactions, opening balances, balances, timestamp) and `importData(json)` (validates structure, does a full replace, then calls `recalculateBalances()` to ensure consistency).
+- **Modified**: `src/ui/settings.js` - Wired `btn-export-data` to trigger a dated `.json` file download via `Blob` + `URL.createObjectURL`. Wired `btn-import-data` to trigger a hidden `<input type="file">`, reads the file via `FileReader`, shows a confirmation dialog before overwriting, then calls `importData()` and refreshes the dashboard.
+- **Modified**: `src/index.html` - Added "Backup Data" button, "Restore from Backup" button, and a hidden file input inside the Settings dialog under a new "Data Backup" section.
+- **Why**: `localStorage` data is lost if the user clears browser storage. A manual JSON backup/restore ensures data survives across browser resets with no server dependency.
+
+### Plain English Summary
+
+The Settings screen now has a "Data Backup" section with two buttons. "Backup Data" downloads your entire transaction history and opening balances as a `.json` file to your device. "Restore from Backup" lets you pick a previously downloaded `.json` file — after a confirmation prompt, it completely replaces all current app data with the contents of the backup. I also fixed the USD/LBP labels in the Opening Balances inputs so they are properly centered.
+
+---
+
 ## [Task 1] Scaffold PWA Shell
 
 - **Date**: 2026-06-21
