@@ -7,11 +7,18 @@
   --bg-color: #051412;
   --font-family:
     system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --radius: 12px;
+  --transition: 150ms ease;
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  padding: 1rem;
+  padding: 1.25rem 1rem;
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-family);
@@ -30,29 +37,42 @@ body {
   gap: 1.5rem;
 }
 
+/* ── Header ── */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 0.25rem;
 }
 
 header h1 {
   color: var(--accent-color);
   margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: -0.5px;
 }
 
 .btn-icon {
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.4rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
+  transition:
+    color var(--transition),
+    background var(--transition);
+}
+.btn-icon:hover {
+  color: var(--accent-color);
+  background: rgba(255, 183, 3, 0.1);
 }
 
+/* ── Dashboard ── */
 main#dashboard {
   width: 100%;
   display: flex;
@@ -61,42 +81,78 @@ main#dashboard {
   padding-bottom: 5rem; /* space for FAB */
 }
 
-/* Base resets */
-* {
-  box-sizing: border-box;
+.wallet-cards {
+  display: flex;
+  gap: 1rem;
+}
+.wallet-card {
+  flex: 1;
+  background-color: var(--secondary-color);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+.wallet-card h2 {
+  margin: 0.35rem 0 0 0;
+  font-size: 2.2rem;
+  font-weight: 700;
+  word-break: break-word;
+  line-height: 1.1;
+}
+#card-usd h2 {
+  color: var(--accent-color);
+}
+#card-lbp h2 {
+  color: var(--text-primary);
+}
+.currency-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
 }
 
-/* Dialog and Form */
+/* ── Dialog and Form ── */
 dialog {
   background-color: var(--secondary-color);
   color: var(--text-primary);
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius);
   padding: 1.5rem;
   width: 90%;
-  max-width: 400px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  max-width: 420px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
 }
 dialog::backdrop {
-  background: rgba(5, 20, 18, 0.8);
-  backdrop-filter: blur(2px);
+  background: rgba(5, 20, 18, 0.85);
+  backdrop-filter: blur(3px);
 }
 dialog h2 {
-  margin-top: 0;
+  margin: 0 0 1.25rem 0;
   color: var(--accent-color);
+  font-size: 1.2rem;
+  letter-spacing: -0.3px;
 }
+
 .tx-section {
   margin-bottom: 1.5rem;
 }
 .tx-section h3 {
   margin: 0 0 0.5rem 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 .optional {
   font-size: 0.8rem;
-  opacity: 0.7;
+  opacity: 0.6;
+  text-transform: none;
+  letter-spacing: 0;
 }
+
 .amount-row {
   display: flex;
   gap: 0.5rem;
@@ -106,28 +162,44 @@ dialog h2 {
 .note-input {
   flex: 1;
   background-color: var(--primary-color);
-  border: 1px solid var(--text-secondary);
+  border: 1.5px solid rgba(163, 184, 181, 0.35);
   color: var(--text-primary);
   border-radius: 8px;
   padding: 0.75rem;
   font-size: 1.2rem;
   font-family: inherit;
   width: 100%;
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+.amount-input:focus,
+.note-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(255, 183, 3, 0.18);
 }
 .note-input {
   font-size: 1rem;
 }
+
 .currency-toggle {
   background-color: var(--accent-color);
   color: var(--bg-color);
   border: none;
   border-radius: 8px;
   padding: 0 1rem;
-  font-weight: bold;
-  font-size: 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
   cursor: pointer;
-  min-width: 80px;
+  min-width: 76px;
+  transition: opacity var(--transition);
 }
+.currency-toggle:hover {
+  opacity: 0.85;
+}
+
+/* ── Buttons ── */
 .btn-text {
   background: none;
   border: none;
@@ -137,13 +209,19 @@ dialog h2 {
   padding: 0;
   text-decoration: underline;
   margin-top: 0.25rem;
+  transition: opacity var(--transition);
 }
+.btn-text:hover {
+  opacity: 0.75;
+}
+
 .dialog-actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 1.5rem;
 }
+
 .btn-primary,
 .btn-secondary {
   border: none;
@@ -151,7 +229,19 @@ dialog h2 {
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 700;
+  transition:
+    opacity var(--transition),
+    transform var(--transition);
+}
+.btn-primary:hover,
+.btn-secondary:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0);
 }
 .btn-primary {
   background-color: var(--accent-color);
@@ -160,8 +250,10 @@ dialog h2 {
 .btn-secondary {
   background-color: transparent;
   color: var(--text-secondary);
-  border: 1px solid var(--text-secondary);
+  border: 1.5px solid rgba(163, 184, 181, 0.5);
 }
+
+/* FAB */
 #btn-open-add-tx {
   width: 60px;
   height: 60px;
@@ -173,38 +265,18 @@ dialog h2 {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 16px rgba(255, 183, 3, 0.4);
   padding: 0;
+  transition:
+    box-shadow var(--transition),
+    transform var(--transition);
+}
+#btn-open-add-tx:hover {
+  box-shadow: 0 6px 24px rgba(255, 183, 3, 0.6);
+  transform: scale(1.08);
 }
 
-/* Dashboard Styles */
-.wallet-cards {
-  display: flex;
-  gap: 1rem;
-}
-.wallet-card {
-  flex: 1;
-  background-color: var(--secondary-color);
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
-.wallet-card h2 {
-  margin: 0.5rem 0 0 0;
-  font-size: 1.8rem;
-  word-break: break-word;
-}
-#card-usd h2 {
-  color: var(--accent-color);
-}
-.currency-label {
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-/* Dashboard cleanup */
+/* ── Transaction items ── */
 .tx-list {
   list-style: none;
   padding: 0;
@@ -214,8 +286,9 @@ dialog h2 {
   gap: 0.75rem;
 }
 .tx-item {
-  background-color: var(--secondary-color);
-  border-radius: 8px;
+  background-color: var(--primary-color);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
   padding: 0.75rem 1rem;
   display: flex;
   flex-direction: column;
@@ -230,13 +303,14 @@ dialog h2 {
 .tx-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.2rem;
 }
 .tx-note {
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 .tx-date {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
 }
 .tx-amounts {
@@ -247,11 +321,12 @@ dialog h2 {
 }
 .tx-net-usd {
   color: var(--accent-color);
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 .tx-net-lbp {
-  color: var(--text-primary);
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
 }
 .tx-positive {
   color: #4ade80 !important;
@@ -263,12 +338,12 @@ dialog h2 {
   text-align: center;
   color: var(--text-secondary);
   font-style: italic;
-  padding: 2rem 0;
+  padding: 2.5rem 0;
 }
 
-/* History Screen Specific */
+/* ── History Dialog ── */
 .full-dialog {
-  max-width: 600px;
+  max-width: 560px;
   height: 90vh;
   margin: auto;
   flex-direction: column;
@@ -276,16 +351,10 @@ dialog h2 {
 .full-dialog[open] {
   display: flex;
 }
-.full-dialog form {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
 .full-dialog .tx-list {
   overflow-y: auto;
   flex: 1;
-  padding-right: 0.5rem;
+  padding-right: 0.25rem;
 }
 .dialog-header {
   display: flex;
@@ -300,23 +369,35 @@ dialog h2 {
   font-size: 2rem;
   cursor: pointer;
   line-height: 1;
-  padding: 0 0.5rem;
+  padding: 0 0.25rem;
+  transition: color var(--transition);
 }
+.btn-close:hover {
+  color: var(--text-primary);
+}
+
 .tx-actions {
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
   padding-top: 0.5rem;
   margin-top: 0.25rem;
 }
 .btn-small {
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 0.8rem;
   font-size: 0.8rem;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 .btn-danger {
   background-color: transparent;
   color: #f87171;
-  border: 1px solid #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  transition:
+    background var(--transition),
+    border-color var(--transition);
+}
+.btn-danger:hover {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: #f87171;
 }
