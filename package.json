@@ -1,0 +1,43 @@
+{
+  "name": "webpack-merge",
+  "version": "1.0.0",
+  "description": "Webpack merge's config as a template for faster setups",
+  "homepage": "https://github.com/Nour-Al-Hazzouri/webpack-merge#readme",
+  "bugs": {
+    "url": "https://github.com/Nour-Al-Hazzouri/webpack-merge/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nour-Al-Hazzouri/webpack-merge.git"
+  },
+  "license": "ISC",
+  "author": "Nour Al Hazzouri",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --config webpack.dev.js",
+    "build": "webpack --config webpack.prod.js",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "css-loader": "^7.1.4",
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.7",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "3.8.3",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.106.2",
+    "webpack-cli": "^7.0.2",
+    "webpack-dev": "^1.1.1",
+    "webpack-dev-server": "^5.2.3",
+    "webpack-merge": "^6.0.1"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  }
+}
