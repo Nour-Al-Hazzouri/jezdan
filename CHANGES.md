@@ -115,7 +115,29 @@ I have built the main Dashboard for the Jezdan app. Now, when you open the app, 
 
 ### Plain English Summary
 
-I have built the "Transaction History" screen. You will now see a "View All History" button on the dashboard if you have transactions. Tapping it opens a full-screen scrollable list of everything you've recorded. Inside, each transaction now has an "Edit" and "Delete" button. Deleting a transaction safely rolls back your wallet balances. Editing a transaction re-opens the Add Transaction form pre-filled with your old data; when you save your changes, the app calculates the exact difference and correctly updates your wallet balances.
+I have implemented the Settings screen and cleaned up the Dashboard. The Dashboard no longer displays an "Estimated Total" or an inline list of recent transactions. Instead, it purely shows your live USD and LBP wallets, with a prominent button to open the full Transaction History dialog. I also added a gear icon to the top right of the screen; tapping it opens a Settings dialog where you can manually adjust your Opening Balances for both USD and LBP. Any changes made there instantly update your live dashboard without wiping any of your past transactions.
+
+## [Task 7] Polish Pass
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Final UX and visual pass: improved balance legibility, added micro-animations, focus rings, contrast fixes, and removed dead CSS.
+
+### Technical Log
+
+- **Modified**: `src/ui/styles.css` - Full rewrite of the CSS file:
+  - Wallet balance numbers increased to `2.2rem` / `font-weight: 700` for legibility.
+  - Added `--transition` and `--radius` CSS variables for consistency.
+  - Added `:focus` gold outline + box-shadow on all inputs (accessibility).
+  - Added `transition` + `hover` states on all buttons (FAB, primary, secondary, icon, close, danger).
+  - FAB now has an amber glow `box-shadow` and scales up on hover.
+  - Removed dead `.dashboard-cleanup` comment and unused `.estimate-row` / `.recent-transactions` rules.
+  - Tightened dialog backdrop to `0.85` opacity and `blur(3px)` for better depth.
+  - Improved `tx-item` contrast by switching background to `--primary-color` with a faint border.
+- **Why**: Task 7 final pass — the goal is a premium feel where every touchpoint has a micro-response and balances are immediately readable at arm's length on a phone screen.
+
+### Plain English Summary
+
+I've polished the entire look and feel of the app for the final task. Your USD and LBP wallet numbers are now much larger and bolder — easy to read at a glance. Every button now has a subtle hover animation and the "+" FAB glows amber when you hover over it. All text inputs now highlight gold when you tap them (a focus ring), making it clear which field you are typing in. I also cleaned up leftover CSS that was no longer used, reducing file size.
 
 ## [Task 6] Settings Screen & Dashboard Refactor
 
