@@ -15,11 +15,32 @@
       <header>
         <h1>Jezdan</h1>
       </header>
-      <main>
-        <p>Dual-Currency Cash Tracker</p>
+      <main id="dashboard">
+        <section class="wallet-cards">
+          <div class="wallet-card" id="card-usd">
+            <span class="currency-label">USD</span>
+            <h2 id="usd-balance">0.00</h2>
+          </div>
+          <div class="wallet-card" id="card-lbp">
+            <span class="currency-label">LBP</span>
+            <h2 id="lbp-balance">0</h2>
+          </div>
+        </section>
+
+        <section class="estimate-row">
+          <span class="estimate-label">≈ Estimated Total</span>
+          <h3 id="estimated-total">0.00 USD</h3>
+        </section>
+
+        <section class="recent-transactions">
+          <h3>Recent Transactions</h3>
+          <ul id="recent-tx-list">
+            <!-- Transactions populated via JS -->
+            <li class="empty-state">No transactions yet</li>
+          </ul>
+        </section>
       </main>
 
-      <!-- Placeholder floating button for Task 3 verification -->
       <button id="btn-open-add-tx" class="btn-primary">+</button>
 
       <dialog id="add-tx-dialog">

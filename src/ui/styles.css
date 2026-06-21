@@ -11,14 +11,14 @@
 
 body {
   margin: 0;
-  padding: 0;
+  padding: 1rem;
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-family);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   min-height: 100vh;
 }
 
@@ -27,9 +27,13 @@ header h1 {
   margin-bottom: 0.5rem;
 }
 
-main p {
-  color: var(--text-secondary);
-  font-size: 1.2rem;
+main#dashboard {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 5rem; /* space for FAB */
 }
 
 /* Base resets */
@@ -146,4 +150,110 @@ dialog h2 {
   right: 2rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   padding: 0;
+}
+
+/* Dashboard Styles */
+.wallet-cards {
+  display: flex;
+  gap: 1rem;
+}
+.wallet-card {
+  flex: 1;
+  background-color: var(--secondary-color);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+.wallet-card h2 {
+  margin: 0.5rem 0 0 0;
+  font-size: 1.8rem;
+  word-break: break-word;
+}
+#card-usd h2 {
+  color: var(--accent-color);
+}
+.currency-label {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.estimate-row {
+  text-align: center;
+  color: var(--text-secondary);
+  background-color: rgba(26, 74, 66, 0.3);
+  padding: 0.75rem;
+  border-radius: 8px;
+}
+.estimate-label {
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.estimate-row h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+.recent-transactions h3 {
+  font-size: 1.1rem;
+  border-bottom: 1px solid var(--secondary-color);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+#recent-tx-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.tx-item {
+  background-color: var(--secondary-color);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.tx-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.tx-note {
+  font-weight: bold;
+}
+.tx-date {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+.tx-amounts {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+.tx-net-usd {
+  color: var(--accent-color);
+  font-weight: bold;
+}
+.tx-net-lbp {
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+.tx-positive {
+  color: #4ade80 !important;
+}
+.tx-negative {
+  color: #f87171 !important;
+}
+.empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 2rem 0;
 }

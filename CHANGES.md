@@ -79,3 +79,21 @@ I resolved the issue where pushing to the development branch (`dev`) did not upd
 ### Plain English Summary
 
 I have built the "Add Transaction" screen. It is currently accessible via a floating "+" button. When you tap it, a popup appears allowing you to enter amounts you've paid and optional amounts you've received back as change. It fully supports mixing USD and LBP in a single transaction. When you hit Save, it securely saves to the storage engine we built in the previous step.
+
+## [Task 4] Dashboard / Home Screen
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Implemented the main dashboard UI, integrating it with the storage layer to display real-time balances, an estimated combined total, and a list of recent transactions.
+
+### Technical Log
+
+- **Modified**: `src/index.html` - Replaced the placeholder `<main>` content with the dashboard structure (wallet cards, estimate row, recent transactions list).
+- **Modified**: `src/ui/styles.css` - Added styling for the dashboard layout, wallet cards, and transaction list items. Adjusted the `body` layout to support scrolling.
+- **New**: `src/ui/dashboard.js` - Created the logic to fetch data from `storage.js` and render the dashboard elements, including formatting currency and dates.
+- **Modified**: `src/ui/addTransaction.js` - Updated the form submission to call `renderDashboard()` to provide immediate visual feedback upon saving a transaction.
+- **Modified**: `src/index.js` - Initialized the dashboard on application load.
+- **Why**: This fulfills Task 4, providing the user with an immediate overview of their finances. The approach emphasizes separation of concerns by placing the rendering logic in its own module (`dashboard.js`).
+
+### Plain English Summary
+
+I have built the main Dashboard for the Jezdan app. Now, when you open the app, you will immediately see your current balances for both USD and LBP in large, clear numbers. Below that, it shows an estimated total combining both currencies into a single USD amount. Finally, it displays a list of your 10 most recent transactions, showing the date, any notes you added, and the exact amounts paid or received. When you add a new transaction, the dashboard updates instantly without needing to reload the page.
