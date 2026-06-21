@@ -1,5 +1,21 @@
 # Changes
 
+## [UI] Transaction Currency Constraints
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Enforced opposite currencies and disabled toggling when multiple inputs are added to Paid or Received sections.
+
+### Technical Log
+
+- **Modified**: `src/ui/addTransaction.js` - Added `updateToggles()` logic. When adding a second currency row in either the Paid or Received sections, the second currency is strictly set to the opposite of the first (e.g. if row 1 is USD, row 2 is LBP). Furthermore, the currency toggle buttons on both rows are disabled, preventing meaningless combinations like paying 2 separate amounts in USD.
+- **Why**: Prevent user error and simplify the UI logic. Splitting a payment into two rows of the same currency offers no functional benefit, so the UI now correctly restricts the second row to only handle the cross-currency component.
+
+### Plain English Summary
+
+When adding a transaction, if you add a second input row for what you paid or what you received back, the app now automatically ensures that one input is for USD and the other is for LBP. It also locks the currency buttons so you can't accidentally select USD for both inputs or LBP for both inputs.
+
+---
+
 ## [PWA Updates] Service Worker Stale-While-Revalidate
 
 - **Date**: 2026-06-21

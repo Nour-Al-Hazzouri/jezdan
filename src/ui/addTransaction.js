@@ -56,6 +56,28 @@ export function initAddTransactionUI() {
     return row;
   }
 
+  function updateToggles(container) {
+    const rows = container.children;
+    if (rows.length === 2) {
+      const firstBtn = rows[0].querySelector(".currency-toggle");
+      const secondBtn = rows[1].querySelector(".currency-toggle");
+
+      const expectedSecond =
+        firstBtn.dataset.currency === "USD" ? "LBP" : "USD";
+      secondBtn.dataset.currency = expectedSecond;
+      secondBtn.textContent = expectedSecond;
+
+      firstBtn.disabled = true;
+      secondBtn.disabled = true;
+      firstBtn.style.opacity = "0.7";
+      secondBtn.style.opacity = "0.7";
+    } else if (rows.length === 1) {
+      const firstBtn = rows[0].querySelector(".currency-toggle");
+      firstBtn.disabled = false;
+      firstBtn.style.opacity = "1";
+    }
+  }
+
   function resetForm() {
     form.reset();
     paidRowsContainer.innerHTML = "";
@@ -63,6 +85,8 @@ export function initAddTransactionUI() {
 
     // Default 1 paid row (required)
     paidRowsContainer.appendChild(createRow(null, true));
+    updateToggles(paidRowsContainer);
+    updateToggles(receivedRowsContainer);
 
     btnAddPaid.style.display = "inline-block";
     btnAddReceived.style.display = "inline-block";
@@ -91,13 +115,24 @@ export function initAddTransactionUI() {
       paidRowsContainer.appendChild(
         createRow(firstCurrency === "USD" ? "LBP" : "USD"),
       );
+      updateToggles(paidRowsContainer);
       btnAddPaid.style.display = "none"; // Max 2 rows
     }
   });
 
   btnAddReceived.addEventListener("click", () => {
     if (receivedRowsContainer.children.length < 2) {
-      receivedRowsContainer.appendChild(createRow());
+      const firstCurrency =
+        receivedRowsContainer.children.length === 1
+          ? receivedRowsContainer.children[0].querySelector(".currency-toggle")
+              .dataset.currency
+          : null;
+      receivedRowsContainer.appendChild(
+        createRow(
+          firstCurrency ? (firstCurrency === "USD" ? "LBP" : "USD") : null,
+        ),
+      );
+      updateToggles(receivedRowsContainer);
       if (receivedRowsContainer.children.length === 2) {
         btnAddReceived.style.display = "none"; // Max 2 rows
       }
@@ -161,6 +196,7 @@ export function initAddTransactionUI() {
     } else {
       paidRowsContainer.appendChild(createRow(null, true));
     }
+    updateToggles(paidRowsContainer);
     btnAddPaid.style.display =
       paidRowsContainer.children.length < 2 ? "inline-block" : "none";
 
@@ -171,6 +207,7 @@ export function initAddTransactionUI() {
         ),
       );
     }
+    updateToggles(receivedRowsContainer);
     btnAddReceived.style.display =
       receivedRowsContainer.children.length < 2 ? "inline-block" : "none";
 
