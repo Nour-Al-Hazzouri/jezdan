@@ -50,6 +50,10 @@ export function getBalances() {
   return readData(KEYS.BALANCES, { usd: 0, lbp: 0 });
 }
 
+export function getOpeningBalances() {
+  return readData(KEYS.OPENING_BALANCES, { usd: 0, lbp: 0 });
+}
+
 export function setOpeningBalances(usd, lbp) {
   writeData(KEYS.OPENING_BALANCES, {
     usd: Number(usd) || 0,

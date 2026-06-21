@@ -14,6 +14,9 @@
     <div id="app">
       <header>
         <h1>Jezdan</h1>
+        <button type="button" id="btn-open-settings" class="btn-icon">
+          ⚙️
+        </button>
       </header>
       <main id="dashboard">
         <section class="wallet-cards">
@@ -27,29 +30,14 @@
           </div>
         </section>
 
-        <section class="estimate-row">
-          <span class="estimate-label">≈ Estimated Total</span>
-          <h3 id="estimated-total">0.00 USD</h3>
-        </section>
-
-        <section class="recent-transactions">
-          <h3>Recent Transactions</h3>
-          <ul id="recent-tx-list" class="tx-list">
-            <!-- Transactions populated via JS -->
-            <li class="empty-state">No transactions yet</li>
-          </ul>
+        <section class="dashboard-actions">
           <button
             type="button"
             id="btn-open-history"
-            class="btn-text"
-            style="
-              display: none;
-              width: 100%;
-              text-align: center;
-              margin-top: 1rem;
-            "
+            class="btn-secondary"
+            style="width: 100%"
           >
-            View All History
+            View Transaction History
           </button>
         </section>
       </main>
@@ -106,6 +94,49 @@
         <ul id="full-history-list" class="tx-list">
           <!-- Populated by JS -->
         </ul>
+      </dialog>
+
+      <dialog id="settings-dialog">
+        <form id="settings-form">
+          <div class="dialog-header">
+            <h2>Settings</h2>
+            <button type="button" id="btn-close-settings" class="btn-close">
+              &times;
+            </button>
+          </div>
+
+          <section class="tx-section">
+            <h3>Opening Balances</h3>
+            <div class="amount-row" style="margin-bottom: 0.5rem">
+              <input
+                type="number"
+                id="setting-open-usd"
+                class="amount-input"
+                placeholder="0.00"
+                step="any"
+                required
+              />
+              <span class="currency-toggle" style="cursor: default">USD</span>
+            </div>
+            <div class="amount-row">
+              <input
+                type="number"
+                id="setting-open-lbp"
+                class="amount-input"
+                placeholder="0"
+                step="any"
+                required
+              />
+              <span class="currency-toggle" style="cursor: default">LBP</span>
+            </div>
+          </section>
+
+          <div class="dialog-actions" style="margin-top: 2rem">
+            <button type="submit" id="btn-save-settings" class="btn-primary">
+              Save Changes
+            </button>
+          </div>
+        </form>
       </dialog>
     </div>
   </body>

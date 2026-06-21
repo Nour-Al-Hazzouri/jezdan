@@ -116,3 +116,22 @@ I have built the main Dashboard for the Jezdan app. Now, when you open the app, 
 ### Plain English Summary
 
 I have built the "Transaction History" screen. You will now see a "View All History" button on the dashboard if you have transactions. Tapping it opens a full-screen scrollable list of everything you've recorded. Inside, each transaction now has an "Edit" and "Delete" button. Deleting a transaction safely rolls back your wallet balances. Editing a transaction re-opens the Add Transaction form pre-filled with your old data; when you save your changes, the app calculates the exact difference and correctly updates your wallet balances.
+
+## [Task 6] Settings Screen & Dashboard Refactor
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Built the Settings screen to manage opening balances and refactored the dashboard to remove exchange rate dependencies and inline history lists per user feedback.
+
+### Technical Log
+
+- **Modified**: `src/index.html` - Removed the "Estimated Total" row and the inline "Recent Transactions" list from the dashboard. Added a gear icon to the header and a new Settings `<dialog>`.
+- **Modified**: `src/ui/dashboard.js` - Removed logic for rendering the estimated total and recent transactions inline.
+- **Modified**: `src/data/storage.js` - Added `getOpeningBalances()` helper to read current opening balances.
+- **New**: `src/ui/settings.js` - Implemented logic to read/write opening balances to the data layer.
+- **Modified**: `src/ui/styles.css` - Added styling for the header gear icon and removed obsolete estimate row styles.
+- **Modified**: `src/index.js` - Initialized the Settings UI on load.
+- **Why**: Implements Task 6 (Settings) while aggressively pruning features deemed unnecessary by the user (Exchange Rate) and cleaning up the dashboard layout so History remains strictly within its dedicated dialog.
+
+### Plain English Summary
+
+I have implemented the Settings screen and cleaned up the Dashboard. The Dashboard no longer displays an "Estimated Total" or an inline list of recent transactions. Instead, it purely shows your live USD and LBP wallets, with a prominent button to open the full Transaction History dialog. I also added a gear icon to the top right of the screen; tapping it opens a Settings dialog where you can manually adjust your Opening Balances for both USD and LBP. Any changes made there instantly update your live dashboard without wiping any of your past transactions.
