@@ -48,3 +48,17 @@ I have set up the deployment of your app to GitHub Pages. It will now build and 
 ### Plain English Summary
 
 I have built the core mathematical and storage engine for the app. The logic for determining how much a wallet goes up or down after a transaction is now implemented, correctly handling cases where you pay in one currency and receive change in another. I also added the underlying structure that will securely save your transactions and balances to your phone's local storage so nothing is lost when the app closes. No visual changes were made, as this is purely backend logic running on your device.
+
+## [Deployment] Enable dev branch deployment and bundle data modules
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Verified dev branch CI triggers and updated entry point index.js to prevent data modules from being tree-shaken out of the production bundle.
+
+### Technical Log
+
+- **Modified**: `src/index.js` - Imported `calculation.js` and `storage.js` and exposed them to `window.Jezdan` for console verification.
+- **Why**: In Webpack, unimported files are tree-shaken and omitted from the build. Since the newly added data modules weren't referenced anywhere, the compiled outputs remained identical, preventing GitHub Actions from pushing deployment updates to `gh-pages`. Exposing them to `window` embeds them in the bundle and allows console-based testing.
+
+### Plain English Summary
+
+I resolved the issue where pushing to the development branch (`dev`) did not update your website. Because the new files we added in the previous task weren't linked anywhere, the build system omitted them, making the final output identical to what was already online. By linking the new code into the main application file (and making them testable from the browser console), the build output changed, prompting the automated deployment to update the site.
