@@ -1,5 +1,6 @@
 import path from "path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyWebpackPlugin from "copy-webpack-plugin";
 
 export default {
   entry: "./src/index.js",
@@ -12,6 +13,14 @@ export default {
     new HtmlWebpackPlugin({
       template: "./src/index.html",
       filename: "index.html",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "src/sw.js", to: "sw.js" },
+        { from: "src/manifest.json", to: "manifest.json" },
+        { from: "src/icon-192.png", to: "icon-192.png" },
+        { from: "src/icon-512.png", to: "icon-512.png" },
+      ],
     }),
   ],
   module: {
