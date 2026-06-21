@@ -1,5 +1,21 @@
 # Changes
 
+## [PWA Updates] Service Worker Stale-While-Revalidate
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Replaced Cache-First strategy with Stale-While-Revalidate and added skipWaiting/clients.claim for automatic PWA updates.
+
+### Technical Log
+
+- **Modified**: `src/sw.js` - Updated `CACHE_NAME` to `jezdan-cache-v2`. Added `self.skipWaiting()` to the `install` event to activate immediately. Added `activate` event listener with `self.clients.claim()` and cache deletion logic. Changed the `fetch` event listener to use a stale-while-revalidate pattern instead of a strict cache-first fallback.
+- **Why**: Previously, updates to app files wouldn't load until the user manually cleared the cache because the service worker remained on Cache-First. With Stale-While-Revalidate, the cache provides instant offline loading, but silently fetches updates in the background. The next time the user visits, they get the updated app without losing their `localStorage` data or having to manually clear cache.
+
+### Plain English Summary
+
+The app now updates automatically in the background! When you open Jezdan while online, it instantly loads the app from its cache (so it's fast and works offline), but it secretly checks the server for updates behind the scenes. If it finds new updates, it downloads them silently so they are ready for the next time you use the app. You no longer need to manually clear your cache to get new features, and your transaction data remains perfectly safe.
+
+---
+
 ## [Backup & Import] Data Backup / Restore + Label Fix
 
 - **Date**: 2026-06-21
