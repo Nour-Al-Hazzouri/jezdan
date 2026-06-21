@@ -1,4 +1,4 @@
-import { addTransaction } from "../data/storage.js";
+import { addTransaction, getBalances } from "../data/storage.js";
 
 export function initAddTransactionUI() {
   const dialog = document.getElementById("add-tx-dialog");
@@ -130,9 +130,7 @@ export function initAddTransactionUI() {
     });
 
     dialog.close();
-
-    // ponytail: Verification hook - output to console until Dashboard UI is ready
-    const { getBalances } = require("../data/storage.js");
+    // ponytail: Verification hook until Dashboard (Task 4) is built
     console.log("Transaction Added! Current Balances:", getBalances());
   });
 }
