@@ -31,3 +31,119 @@ main p {
   color: var(--text-secondary);
   font-size: 1.2rem;
 }
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+}
+
+/* Dialog and Form */
+dialog {
+  background-color: var(--secondary-color);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+dialog::backdrop {
+  background: rgba(5, 20, 18, 0.8);
+  backdrop-filter: blur(2px);
+}
+dialog h2 {
+  margin-top: 0;
+  color: var(--accent-color);
+}
+.tx-section {
+  margin-bottom: 1.5rem;
+}
+.tx-section h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+.optional {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+.amount-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.amount-input,
+.note-input {
+  flex: 1;
+  background-color: var(--primary-color);
+  border: 1px solid var(--text-secondary);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 0.75rem;
+  font-size: 1.2rem;
+  font-family: inherit;
+  width: 100%;
+}
+.note-input {
+  font-size: 1rem;
+}
+.currency-toggle {
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+  border: none;
+  border-radius: 8px;
+  padding: 0 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  min-width: 80px;
+}
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  margin-top: 0.25rem;
+}
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.btn-primary,
+.btn-secondary {
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+.btn-primary {
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+}
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--text-secondary);
+}
+#btn-open-add-tx {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  padding: 0;
+}

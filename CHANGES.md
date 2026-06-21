@@ -62,3 +62,20 @@ I have built the core mathematical and storage engine for the app. The logic for
 ### Plain English Summary
 
 I resolved the issue where pushing to the development branch (`dev`) did not update your website. Because the new files we added in the previous task weren't linked anywhere, the build system omitted them, making the final output identical to what was already online. By linking the new code into the main application file (and making them testable from the browser console), the build output changed, prompting the automated deployment to update the site.
+
+## [Task 3] Add Transaction screen
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Implemented the Add Transaction modal UI, wiring it to the local storage data layer and updating the main layout to include it natively.
+
+### Technical Log
+
+- **Modified**: `src/index.html` - Added `<dialog>` containing the add transaction form with dynamic row support for multiple currencies.
+- **Modified**: `src/ui/styles.css` - Styled the dialog, backdrop, and form inputs to match the deep teal and gold dark theme.
+- **New**: `src/ui/addTransaction.js` - Handled form submission, dynamic DOM row creation/removal, and integrating with `storage.js`.
+- **Modified**: `src/index.js` - Linked and initialized the `addTransaction.js` module.
+- **Why**: Providing the core UX requested in Task 3. We used the native `<dialog>` element to avoid heavy modal abstractions, keeping it lightweight per the lazy dev philosophy (`ponytail.md`).
+
+### Plain English Summary
+
+I have built the "Add Transaction" screen. It is currently accessible via a floating "+" button. When you tap it, a popup appears allowing you to enter amounts you've paid and optional amounts you've received back as change. It fully supports mixing USD and LBP in a single transaction. When you hit Save, it securely saves to the storage engine we built in the previous step.
