@@ -33,3 +33,18 @@ I have built the foundational skeleton for the Jezdan app. It now has the necess
 ### Plain English Summary
 
 I have set up the deployment of your app to GitHub Pages. It will now build and update the site automatically whenever you push to GitHub.
+
+## [Task 2] Data Layer
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Implementation of local storage wrappers and pure currency calculation logic based on SOLID principles.
+
+### Technical Log
+
+- **New**: `src/data/calculation.js` - Implemented `calculateNetEffect` function to dynamically compute net transaction effects independent of specific currencies.
+- **New**: `src/data/storage.js` - Added `localStorage` wrapper to handle transactions, opening balances, current balances, and exchange rate. Exposes specific storage APIs like `addTransaction()`, `getBalances()`, without revealing internal `localStorage` interactions.
+- **Why**: To separate business logic (currency calculation) from persistence logic (storage), adhering to the Single Responsibility Principle. Treating currency as a dynamic parameter adheres to the Open/Closed Principle.
+
+### Plain English Summary
+
+I have built the core mathematical and storage engine for the app. The logic for determining how much a wallet goes up or down after a transaction is now implemented, correctly handling cases where you pay in one currency and receive change in another. I also added the underlying structure that will securely save your transactions and balances to your phone's local storage so nothing is lost when the app closes. No visual changes were made, as this is purely backend logic running on your device.
