@@ -18,3 +18,18 @@
 ### Plain English Summary
 
 I have built the foundational skeleton for the Jezdan app. It now has the necessary setup to be "installable" on a phone (via a manifest file) and can theoretically work without an internet connection (via a service worker). The basic screen now uses the requested dark green and gold color scheme.
+
+## [Deployment] Automate GitHub Pages Deployment
+
+- **Date**: 2026-06-21
+- **Technical Summary**: Created automated GitHub Actions pipeline and a local shell script to deploy the build outputs (dist folder) to the gh-pages branch.
+
+### Technical Log
+
+- **New**: `.github/workflows/deploy.yml` - Set up automated deploy workflow on pushes to main.
+- **Modified**: `package.json` - Added `deploy` command to trigger the local deployment script.
+- **Why**: Since the build output directory `dist` is gitignored, standard git subtrees don't work cleanly. This setup automates production builds and forces the output directory into the `gh-pages` branch.
+
+### Plain English Summary
+
+I have set up the deployment of your app to GitHub Pages. It will now build and update the site automatically whenever you push to GitHub.
