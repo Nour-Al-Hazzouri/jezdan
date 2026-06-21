@@ -338,6 +338,33 @@ dialog h2 {
 .tx-negative {
   color: #f87171 !important;
 }
+/* Month group header */
+.tx-month-header {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.25rem 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 0.75rem;
+}
+.tx-month-header:first-child {
+  margin-top: 0;
+}
+.tx-month-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.tx-month-totals {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .empty-state {
   text-align: center;
   color: var(--text-secondary);
