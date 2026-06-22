@@ -1,5 +1,19 @@
 # Changes
 
+## [Feature] Amount Input Auto-Comma Formatting
+
+- **Date**: 2026-06-22
+- **Technical Summary**: Added auto-comma formatting for all amount inputs.
+
+### Technical Log
+
+- **Modified**: `src/ui/addTransaction.js` - Changed `.amount-input` to `type="text"` to allow custom formatting. Implemented a `formatInput` function listening on the `input` event to automatically inject commas for thousands, while preserving decimal points and cursor position. `getRowData` strips commas before parsing.
+- **Modified**: `src/index.html` - Changed `setting-open-usd` and `setting-open-lbp` to `type="text"` and `inputmode="decimal"`.
+- **Modified**: `src/ui/settings.js` - Added the same comma formatting logic (`formatInput`) for the opening balance fields.
+- **Why**: Typing large numbers like 1000000 is error-prone, auto-commas vastly improve readability.
+
+---
+
 ## [UI] Transaction Currency Constraints
 
 - **Date**: 2026-06-21

@@ -33,21 +33,52 @@ export function initAddTransactionUI() {
     const row = document.createElement("div");
     row.className = "amount-row";
 
+    const currentCurrency = defaultCurrency || getLastCurrency();
+
     const input = document.createElement("input");
-    input.type = "number";
+    input.type = "text";
     input.inputMode = "decimal";
     input.className = "amount-input";
     input.placeholder = "0.00";
-    input.step = "any";
-    input.min = "0";
     if (isRequired) input.required = true;
-    if (defaultAmount !== "") input.value = defaultAmount;
+
+    const formatInput = (val) => {
+      let raw = val.toString().replace(/[^\d.]/g, "");
+      const dotIndex = raw.indexOf(".");
+      if (dotIndex !== -1) {
+        raw =
+          raw.slice(0, dotIndex + 1) +
+          raw.slice(dotIndex + 1).replace(/\./g, "");
+      }
+      const parts = raw.split(".");
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return parts.join(".");
+    };
+
+    if (defaultAmount !== "") {
+      input.value = formatInput(defaultAmount);
+    }
+
+    input.addEventListener("input", function () {
+      const cursorPosition = this.selectionStart;
+      const oldLength = this.value.length;
+
+      const formatted = formatInput(this.value);
+      this.value = formatted;
+
+      try {
+        const newCursor = cursorPosition + (formatted.length - oldLength);
+        this.setSelectionRange(newCursor, newCursor);
+      } catch (e) {
+        // some browsers throw error on setSelectionRange
+      }
+    });
 
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "currency-toggle";
-    btn.dataset.currency = defaultCurrency || getLastCurrency();
-    btn.textContent = btn.dataset.currency;
+    btn.dataset.currency = currentCurrency;
+    btn.textContent = currentCurrency;
 
     btn.addEventListener("click", () => toggleCurrency(btn));
 
@@ -64,8 +95,11 @@ export function initAddTransactionUI() {
 
       const expectedSecond =
         firstBtn.dataset.currency === "USD" ? "LBP" : "USD";
-      secondBtn.dataset.currency = expectedSecond;
-      secondBtn.textContent = expectedSecond;
+
+      if (secondBtn.dataset.currency !== expectedSecond) {
+        secondBtn.dataset.currency = expectedSecond;
+        secondBtn.textContent = expectedSecond;
+      }
 
       firstBtn.disabled = true;
       secondBtn.disabled = true;
@@ -148,7 +182,9 @@ export function initAddTransactionUI() {
         const amountVal = row.querySelector(".amount-input").value;
         const currency = row.querySelector(".currency-toggle").dataset.currency;
         if (amountVal) {
-          rows.push({ amount: parseFloat(amountVal), currency });
+          let amount = parseFloat(amountVal.replace(/,/g, ""));
+          if (isNaN(amount)) continue;
+          rows.push({ amount, currency });
         }
       }
       return rows;

@@ -21,10 +21,38 @@ export function initSettingsUI() {
 
   if (!dialog || !btnOpen || !btnClose || !form) return;
 
+  const formatInput = (val) => {
+    let raw = val.toString().replace(/[^\d.]/g, "");
+    const dotIndex = raw.indexOf(".");
+    if (dotIndex !== -1) {
+      raw =
+        raw.slice(0, dotIndex + 1) + raw.slice(dotIndex + 1).replace(/\./g, "");
+    }
+    const parts = raw.split(".");
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return parts.join(".");
+  };
+
+  const handleInputFormat = function () {
+    const cursorPosition = this.selectionStart;
+    const oldLength = this.value.length;
+
+    const formatted = formatInput(this.value);
+    this.value = formatted;
+
+    try {
+      const newCursor = cursorPosition + (formatted.length - oldLength);
+      this.setSelectionRange(newCursor, newCursor);
+    } catch (e) {}
+  };
+
+  inputUsd.addEventListener("input", handleInputFormat);
+  inputLbp.addEventListener("input", handleInputFormat);
+
   btnOpen.addEventListener("click", () => {
     const opening = getOpeningBalances();
-    inputUsd.value = opening.usd || 0;
-    inputLbp.value = opening.lbp || 0;
+    inputUsd.value = formatInput(opening.usd || 0);
+    inputLbp.value = formatInput(opening.lbp || 0);
     dialog.showModal();
   });
 
@@ -34,7 +62,9 @@ export function initSettingsUI() {
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    setOpeningBalances(inputUsd.value, inputLbp.value);
+    const usdVal = parseFloat(inputUsd.value.replace(/,/g, "")) || 0;
+    const lbpVal = parseFloat(inputLbp.value.replace(/,/g, "")) || 0;
+    setOpeningBalances(usdVal, lbpVal);
     dialog.close();
     renderDashboard();
   });
