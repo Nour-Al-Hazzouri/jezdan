@@ -131,12 +131,6 @@
             </div>
           </section>
 
-          <div class="dialog-actions" style="margin-top: 1.5rem">
-            <button type="submit" id="btn-save-settings" class="btn-primary">
-              Save Changes
-            </button>
-          </div>
-
           <section
             class="tx-section"
             style="margin-top: 1.5rem; margin-bottom: 0"
@@ -157,7 +151,208 @@
               />
             </div>
           </section>
+
+          <section
+            class="tx-section"
+            style="margin-top: 1.5rem; margin-bottom: 0"
+          >
+            <div style="display: flex; align-items: center; gap: 0.5rem">
+              <h3 style="margin: 0">Telegram Auto-Backup</h3>
+              <button type="button" id="btn-tg-help" class="btn-help">?</button>
+            </div>
+
+            <label class="toggle-row" style="margin-top: 0.75rem">
+              <input type="checkbox" id="tg-enabled" />
+              <span>Enable auto-backup to Telegram</span>
+            </label>
+
+            <div id="tg-fields" style="margin-top: 0.75rem; display: none">
+              <label class="field-label">Bot Token</label>
+              <div class="password-row">
+                <input
+                  type="password"
+                  id="tg-bot-token"
+                  class="amount-input"
+                  placeholder="123456789:ABCdef..."
+                  autocomplete="off"
+                />
+                <button
+                  type="button"
+                  class="btn-toggle-vis"
+                  data-target="tg-bot-token"
+                >
+                  👁️
+                </button>
+              </div>
+
+              <label class="field-label" style="margin-top: 0.5rem"
+                >Chat ID</label
+              >
+              <div class="password-row">
+                <input
+                  type="password"
+                  id="tg-chat-id"
+                  class="amount-input"
+                  placeholder="987654321"
+                  autocomplete="off"
+                />
+                <button
+                  type="button"
+                  class="btn-toggle-vis"
+                  data-target="tg-chat-id"
+                >
+                  👁️
+                </button>
+              </div>
+
+              <button
+                type="button"
+                id="btn-tg-test"
+                class="btn-secondary"
+                style="margin-top: 0.75rem; width: 100%"
+              >
+                🔗 Test Connection
+              </button>
+              <p
+                id="tg-test-status"
+                class="tg-status"
+                style="display: none"
+              ></p>
+            </div>
+          </section>
+
+          <div class="dialog-actions" style="margin-top: 2rem">
+            <button
+              type="submit"
+              id="btn-save-settings"
+              class="btn-primary"
+              style="width: 100%"
+            >
+              Save Changes
+            </button>
+          </div>
         </form>
+      </dialog>
+
+      <!-- Custom themed confirm dialog for restore -->
+      <dialog id="confirm-dialog">
+        <h2 id="confirm-title">Confirm</h2>
+        <p id="confirm-message"></p>
+        <div class="dialog-actions">
+          <button type="button" id="confirm-cancel" class="btn-secondary">
+            Cancel
+          </button>
+          <button type="button" id="confirm-proceed" class="btn-primary">
+            Proceed
+          </button>
+        </div>
+      </dialog>
+
+      <!-- Telegram Setup Guide -->
+      <dialog id="telegram-guide-dialog" class="full-dialog">
+        <div class="dialog-header">
+          <h2>Telegram Auto-Backup Setup</h2>
+          <button type="button" id="btn-close-tg-guide" class="btn-close">
+            &times;
+          </button>
+        </div>
+        <div class="guide-content">
+          <div class="guide-step">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <h4>Create your Telegram Bot</h4>
+              <p>
+                Open Telegram and search for <strong>@BotFather</strong> (or tap
+                <a href="https://t.me/BotFather" target="_blank" rel="noopener"
+                  >t.me/BotFather</a
+                >).
+              </p>
+              <p>
+                Tap <strong>Start</strong>, then send the command
+                <code>/newbot</code>.
+              </p>
+              <p>
+                Choose a name (e.g. <em>My Jezdan Backup</em>) and a username
+                ending in <code>bot</code> (e.g. <em>my_jezdan_backup_bot</em>).
+              </p>
+              <p>
+                BotFather will reply with your <strong>HTTP API Token</strong> —
+                it looks like:<br /><code
+                  >123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ</code
+                >
+              </p>
+              <p>Copy this token. You will paste it in the settings.</p>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <h4>Get your Chat ID</h4>
+              <p>
+                Search for <strong>@userinfobot</strong> on Telegram (or tap
+                <a
+                  href="https://t.me/userinfobot"
+                  target="_blank"
+                  rel="noopener"
+                  >t.me/userinfobot</a
+                >).
+              </p>
+              <p>
+                Tap <strong>Start</strong>. It will immediately reply with your
+                <strong>Id</strong> number (e.g. <code>987654321</code>).
+              </p>
+              <p>Copy this number.</p>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <h4>Start your Bot</h4>
+              <p>
+                Search for the bot username you just created in Telegram and tap
+                <strong>Start</strong>.
+              </p>
+              <p>
+                <strong>Important:</strong> The bot cannot send you messages
+                until you start a conversation with it first!
+              </p>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="step-number">4</div>
+            <div class="step-body">
+              <h4>Connect Jezdan</h4>
+              <p>
+                Paste the <strong>Bot Token</strong> and
+                <strong>Chat ID</strong> into the settings fields above.
+              </p>
+              <p>
+                Tap <strong>Test Connection</strong> — you should immediately
+                receive a test message on Telegram.
+              </p>
+              <p>
+                Save your settings. Every transaction will now automatically
+                send a backup file to your Telegram chat! 🎉
+              </p>
+            </div>
+          </div>
+
+          <div class="guide-step">
+            <div class="step-number">💡</div>
+            <div class="step-body">
+              <h4>How to restore from Telegram</h4>
+              <p>
+                If your data is ever lost, open your Telegram chat with the bot.
+                Download the latest <code>.json</code> file, then use the
+                <strong>"⬆ Restore from Backup"</strong> button in Jezdan's
+                settings to import it.
+              </p>
+            </div>
+          </div>
+        </div>
       </dialog>
     </div>
   </body>

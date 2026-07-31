@@ -1,5 +1,64 @@
 # Changes
 
+## [Feature] Telegram Auto-Backup + Custom Confirm Dialog
+
+- **Date**: 2026-08-01
+- **Technical Summary**: Added optional Telegram Bot API integration for automatic cloud backups on every data mutation, plus replaced the native `window.confirm()` for backup restore with a custom themed `<dialog>`.
+
+### Technical Log
+
+- **New**: `src/data/telegram.js` — Telegram API helper module with `sendTelegramMessage` (for connection testing), `sendTelegramDocument` (uploads `.json` backup via `FormData`), and `triggerAutoBackup` (fire-and-forget wrapper that silently fails offline).
+- **Modified**: `src/data/storage.js` — Added `TELEGRAM_CONFIG` storage key, `getTelegramConfig()` / `setTelegramConfig()` exports. Inserted `triggerAutoBackup()` calls inside `addTransaction`, `updateTransaction`, `deleteTransaction`, `setOpeningBalances`, and `importData`.
+- **Modified**: `src/index.html` — Added Telegram Auto-Backup settings section (enable checkbox, password inputs with show/hide, test connection button, `?` help button), a `<dialog id="telegram-guide-dialog">` with A-to-Z setup instructions, and a `<dialog id="confirm-dialog">` for themed restore confirmation.
+- **Modified**: `src/ui/settings.js` — Wired Telegram toggle, password visibility buttons, test connection handler, guide modal, save/load of Telegram config. Replaced `window.confirm()` with `showConfirmDialog()` using the custom themed dialog.
+- **Modified**: `src/ui/styles.css` — Added styles for `.btn-help`, `.toggle-row`, `.password-row`, `.btn-toggle-vis`, `.tg-status`, `.guide-step`, `.step-number`, `.step-body`, and `#confirm-dialog`.
+- **Modified**: `PRD.md` — Updated Settings and scope sections to reflect optional Telegram Auto-Backup.
+- **Modified**: `jezdan-task-breakdown.md` — Added Task 9 (Telegram Auto-Backup) scope and instructions.
+- **Polish**: Moved "Save Changes" button in Settings below Data Backup. Replaced `window.confirm()` in `history.js` with the new custom themed dialog for deleting transactions. Unified Telegram backup filename sequence format with the local file exporter (`YYYY-MM-DD-NNN.json`).
+- **Fix**: Removed `-webkit-tap-highlight-color` across all elements in `styles.css` to eliminate the ugly blue selection glitch when tapping buttons on mobile.
+- **Fix**: Removed logic in `history.js` that hid the "View Transaction History" button when the list was empty, fixing a bug where deleting the last entry caused the button to disappear permanently until refresh.
+- **Why**: Browser storage (localStorage, IndexedDB) can be wiped by "Clear Site Data" and there is no browser API to prevent it. Telegram Bot API provides free, permanent, zero-server cloud storage that users control entirely with their own bot credentials. The custom confirm dialog replaces the jarring browser-native `window.confirm()` which doesn't follow the app's dark theme.
+
+### Plain English Summary
+
+You can now optionally connect Jezdan to a Telegram bot for automatic cloud backups. Every time you add, edit, or delete a transaction, the app silently sends an updated backup file to your private Telegram chat. If your browser data is ever wiped, you can download the latest `.json` file from Telegram and restore it. A step-by-step setup guide (with links to @BotFather and @userinfobot) is built right into the app. The restore confirmation popup now matches the app's dark teal/gold theme instead of using the browser's ugly default dialog.
+
+---
+
+## [Storage] Migrate from localStorage to IndexedDB
+
+- **Date**: 2026-08-01
+- **Technical Summary**: Migrated the entire data persistence layer from `localStorage` to `IndexedDB` to bypass the 5MB storage limit and allow virtually unlimited transaction history.
+
+### Technical Log
+
+- **Modified**: `src/data/storage.js` — Replaced synchronous `localStorage.getItem`/`setItem` with an asynchronous IndexedDB wrapper. The wrapper automatically migrates existing `localStorage` data into IndexedDB on the first read. All exported functions were made `async`. No external dependencies were added.
+- **Modified**: `src/ui/dashboard.js`, `src/ui/history.js`, `src/ui/settings.js`, `src/ui/addTransaction.js` — Updated all UI components that read from or write to the data layer to correctly `await` the new asynchronous IndexedDB calls.
+- **Why**: `localStorage` has a strict ~5MB quota limit. If a user accumulates years of daily transactions, the app would hit this limit and crash when saving new entries. `IndexedDB` shares the browser's global disk quota (typically 60% of free device space), effectively making storage infinite for a text-based ledger.
+
+### Plain English Summary
+
+The app's underlying storage engine has been significantly upgraded. Previously, Jezdan used a storage system that had a strict 5MB size limit (enough for a few years, but potentially risky). It now uses the browser's modern IndexedDB system, which allows it to use available space on your device, meaning you can record millions of transactions without ever running out of room. Existing data is migrated automatically behind the scenes.
+
+---
+
+## [Storage] Persistent Storage Request + Numbered Backup Filenames
+
+- **Date**: 2026-07-31
+- **Technical Summary**: Added `navigator.storage.persist()` on app load and changed backup export filenames from `YYYY-MM-DD` to `YYYY-MM-DD-NNN` sequential numbering.
+
+### Technical Log
+
+- **Modified**: `src/index.js` — Added `navigator.storage.persist()` call after service worker registration. If granted (expected silently on an installed PWA in Brave/Chrome), the browser will not automatically evict app data under storage pressure. Does not protect against manual "Clear site data."
+- **Modified**: `src/ui/settings.js` — Backup export filenames now follow `jezdan-backup-YYYY-MM-DD-NNN.json` format (e.g. `jezdan-backup-2026-07-31-003.json`). A per-day counter is stored in `localStorage` under `jezdan_backup_counter_YYYY-MM-DD` and increments on each export. Counter resets naturally when the date changes.
+- **Why**: `persist()` adds a zero-cost layer of protection against OS/browser-driven auto-eviction. Numbered backup filenames let you distinguish multiple exports made on the same day and know at a glance which is the latest.
+
+### Plain English Summary
+
+The app now asks the browser to mark its storage as "important" so it won't be automatically deleted when your phone is low on space. Backup files you download now include a sequential number at the end of the filename (e.g. `-001`, `-002`) so you can manage multiple backups from the same day without confusion.
+
+---
+
 ## [Feature] Amount Input Auto-Comma Formatting
 
 - **Date**: 2026-06-22

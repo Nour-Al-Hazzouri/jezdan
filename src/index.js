@@ -31,3 +31,12 @@ if ("serviceWorker" in navigator) {
       });
   });
 }
+
+// Request persistent storage so the browser won't auto-evict app data under
+// storage pressure. Granted silently on installed PWAs in Brave/Chrome.
+// ponytail: does NOT protect against manual "Clear site data" — only auto-eviction.
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persist().then((granted) => {
+    console.log(`Persistent storage granted: ${granted}`);
+  });
+}

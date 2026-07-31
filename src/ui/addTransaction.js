@@ -173,7 +173,7 @@ export function initAddTransactionUI() {
     }
   });
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const getRowData = (container) => {
@@ -199,14 +199,14 @@ export function initAddTransactionUI() {
     }
 
     if (editingTx) {
-      updateTransaction(editingTx.id, {
+      await updateTransaction(editingTx.id, {
         ...editingTx,
         paid,
         receivedChange,
         note,
       });
     } else {
-      addTransaction({
+      await addTransaction({
         paid,
         receivedChange,
         note,
@@ -215,7 +215,7 @@ export function initAddTransactionUI() {
     }
 
     dialog.close();
-    renderDashboard();
+    await renderDashboard();
   });
 
   // Expose edit function to the window or as a callback
