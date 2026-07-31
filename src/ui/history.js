@@ -1,5 +1,6 @@
 import { getTransactions, deleteTransaction } from "../data/storage.js";
 import { renderDashboard } from "./dashboard.js";
+import { showConfirmDialog } from "./settings.js";
 
 function formatMoney(amount, currency) {
   if (currency === "USD") {
@@ -181,11 +182,11 @@ export function initHistoryUI() {
         btnDelete.className = "btn-small btn-danger";
         btnDelete.textContent = "Delete";
         btnDelete.addEventListener("click", async () => {
-          if (
-            confirm(
-              "Are you sure you want to delete this transaction? Balances will be rolled back.",
-            )
-          ) {
+          const confirmed = await showConfirmDialog(
+            "Delete Transaction",
+            "Are you sure you want to delete this transaction? Balances will be rolled back.",
+          );
+          if (confirmed) {
             await deleteTransaction(tx.id);
             await renderHistory();
             await renderDashboard();

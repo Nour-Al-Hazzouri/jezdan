@@ -1,5 +1,28 @@
 # Changes
 
+## [Feature] Telegram Auto-Backup + Custom Confirm Dialog
+
+- **Date**: 2026-08-01
+- **Technical Summary**: Added optional Telegram Bot API integration for automatic cloud backups on every data mutation, plus replaced the native `window.confirm()` for backup restore with a custom themed `<dialog>`.
+
+### Technical Log
+
+- **New**: `src/data/telegram.js` — Telegram API helper module with `sendTelegramMessage` (for connection testing), `sendTelegramDocument` (uploads `.json` backup via `FormData`), and `triggerAutoBackup` (fire-and-forget wrapper that silently fails offline).
+- **Modified**: `src/data/storage.js` — Added `TELEGRAM_CONFIG` storage key, `getTelegramConfig()` / `setTelegramConfig()` exports. Inserted `triggerAutoBackup()` calls inside `addTransaction`, `updateTransaction`, `deleteTransaction`, `setOpeningBalances`, and `importData`.
+- **Modified**: `src/index.html` — Added Telegram Auto-Backup settings section (enable checkbox, password inputs with show/hide, test connection button, `?` help button), a `<dialog id="telegram-guide-dialog">` with A-to-Z setup instructions, and a `<dialog id="confirm-dialog">` for themed restore confirmation.
+- **Modified**: `src/ui/settings.js` — Wired Telegram toggle, password visibility buttons, test connection handler, guide modal, save/load of Telegram config. Replaced `window.confirm()` with `showConfirmDialog()` using the custom themed dialog.
+- **Modified**: `src/ui/styles.css` — Added styles for `.btn-help`, `.toggle-row`, `.password-row`, `.btn-toggle-vis`, `.tg-status`, `.guide-step`, `.step-number`, `.step-body`, and `#confirm-dialog`.
+- **Modified**: `PRD.md` — Updated Settings and scope sections to reflect optional Telegram Auto-Backup.
+- **Modified**: `jezdan-task-breakdown.md` — Added Task 9 (Telegram Auto-Backup) scope and instructions.
+- **Polish**: Moved "Save Changes" button in Settings below Data Backup. Replaced `window.confirm()` in `history.js` with the new custom themed dialog for deleting transactions. Unified Telegram backup filename sequence format with the local file exporter (`YYYY-MM-DD-NNN.json`).
+- **Why**: Browser storage (localStorage, IndexedDB) can be wiped by "Clear Site Data" and there is no browser API to prevent it. Telegram Bot API provides free, permanent, zero-server cloud storage that users control entirely with their own bot credentials. The custom confirm dialog replaces the jarring browser-native `window.confirm()` which doesn't follow the app's dark theme.
+
+### Plain English Summary
+
+You can now optionally connect Jezdan to a Telegram bot for automatic cloud backups. Every time you add, edit, or delete a transaction, the app silently sends an updated backup file to your private Telegram chat. If your browser data is ever wiped, you can download the latest `.json` file from Telegram and restore it. A step-by-step setup guide (with links to @BotFather and @userinfobot) is built right into the app. The restore confirmation popup now matches the app's dark teal/gold theme instead of using the browser's ugly default dialog.
+
+---
+
 ## [Storage] Migrate from localStorage to IndexedDB
 
 - **Date**: 2026-08-01
