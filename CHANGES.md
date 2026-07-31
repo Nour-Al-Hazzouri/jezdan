@@ -1,5 +1,22 @@
 # Changes
 
+## [Storage] Persistent Storage Request + Numbered Backup Filenames
+
+- **Date**: 2026-07-31
+- **Technical Summary**: Added `navigator.storage.persist()` on app load and changed backup export filenames from `YYYY-MM-DD` to `YYYY-MM-DD-NNN` sequential numbering.
+
+### Technical Log
+
+- **Modified**: `src/index.js` — Added `navigator.storage.persist()` call after service worker registration. If granted (expected silently on an installed PWA in Brave/Chrome), the browser will not automatically evict app data under storage pressure. Does not protect against manual "Clear site data."
+- **Modified**: `src/ui/settings.js` — Backup export filenames now follow `jezdan-backup-YYYY-MM-DD-NNN.json` format (e.g. `jezdan-backup-2026-07-31-003.json`). A per-day counter is stored in `localStorage` under `jezdan_backup_counter_YYYY-MM-DD` and increments on each export. Counter resets naturally when the date changes.
+- **Why**: `persist()` adds a zero-cost layer of protection against OS/browser-driven auto-eviction. Numbered backup filenames let you distinguish multiple exports made on the same day and know at a glance which is the latest.
+
+### Plain English Summary
+
+The app now asks the browser to mark its storage as "important" so it won't be automatically deleted when your phone is low on space. Backup files you download now include a sequential number at the end of the filename (e.g. `-001`, `-002`) so you can manage multiple backups from the same day without confusion.
+
+---
+
 ## [Feature] Amount Input Auto-Comma Formatting
 
 - **Date**: 2026-06-22
