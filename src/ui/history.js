@@ -54,8 +54,8 @@ export function initHistoryUI() {
 
   if (!dialog || !btnOpen || !btnClose || !listContainer) return;
 
-  function renderHistory() {
-    const txs = getTransactions();
+  async function renderHistory() {
+    const txs = await getTransactions();
 
     if (txs.length === 0) {
       listContainer.innerHTML =
@@ -180,15 +180,15 @@ export function initHistoryUI() {
         btnDelete.type = "button";
         btnDelete.className = "btn-small btn-danger";
         btnDelete.textContent = "Delete";
-        btnDelete.addEventListener("click", () => {
+        btnDelete.addEventListener("click", async () => {
           if (
             confirm(
               "Are you sure you want to delete this transaction? Balances will be rolled back.",
             )
           ) {
-            deleteTransaction(tx.id);
-            renderHistory();
-            renderDashboard();
+            await deleteTransaction(tx.id);
+            await renderHistory();
+            await renderDashboard();
           }
         });
 

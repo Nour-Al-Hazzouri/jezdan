@@ -49,8 +49,8 @@ export function initSettingsUI() {
   inputUsd.addEventListener("input", handleInputFormat);
   inputLbp.addEventListener("input", handleInputFormat);
 
-  btnOpen.addEventListener("click", () => {
-    const opening = getOpeningBalances();
+  btnOpen.addEventListener("click", async () => {
+    const opening = await getOpeningBalances();
     inputUsd.value = formatInput(opening.usd || 0);
     inputLbp.value = formatInput(opening.lbp || 0);
     dialog.showModal();
@@ -60,18 +60,18 @@ export function initSettingsUI() {
     dialog.close();
   });
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const usdVal = parseFloat(inputUsd.value.replace(/,/g, "")) || 0;
     const lbpVal = parseFloat(inputLbp.value.replace(/,/g, "")) || 0;
-    setOpeningBalances(usdVal, lbpVal);
+    await setOpeningBalances(usdVal, lbpVal);
     dialog.close();
-    renderDashboard();
+    await renderDashboard();
   });
 
   // ── Export ──
-  btnExport.addEventListener("click", () => {
-    const data = exportData();
+  btnExport.addEventListener("click", async () => {
+    const data = await exportData();
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
     });
@@ -99,16 +99,16 @@ export function initSettingsUI() {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const json = JSON.parse(e.target.result);
         const confirmed = window.confirm(
           `This will replace ALL current data with the backup from ${json.exportedAt || "unknown date"}.\n\nAre you sure?`,
         );
         if (!confirmed) return;
-        importData(json);
+        await importData(json);
         dialog.close();
-        renderDashboard();
+        await renderDashboard();
       } catch {
         alert(
           "Failed to read backup file. Make sure it is a valid Jezdan backup.",
