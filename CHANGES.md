@@ -1,5 +1,22 @@
 # Changes
 
+## [Storage] Migrate from localStorage to IndexedDB
+
+- **Date**: 2026-08-01
+- **Technical Summary**: Migrated the entire data persistence layer from `localStorage` to `IndexedDB` to bypass the 5MB storage limit and allow virtually unlimited transaction history.
+
+### Technical Log
+
+- **Modified**: `src/data/storage.js` — Replaced synchronous `localStorage.getItem`/`setItem` with an asynchronous IndexedDB wrapper. The wrapper automatically migrates existing `localStorage` data into IndexedDB on the first read. All exported functions were made `async`. No external dependencies were added.
+- **Modified**: `src/ui/dashboard.js`, `src/ui/history.js`, `src/ui/settings.js`, `src/ui/addTransaction.js` — Updated all UI components that read from or write to the data layer to correctly `await` the new asynchronous IndexedDB calls.
+- **Why**: `localStorage` has a strict ~5MB quota limit. If a user accumulates years of daily transactions, the app would hit this limit and crash when saving new entries. `IndexedDB` shares the browser's global disk quota (typically 60% of free device space), effectively making storage infinite for a text-based ledger.
+
+### Plain English Summary
+
+The app's underlying storage engine has been significantly upgraded. Previously, Jezdan used a storage system that had a strict 5MB size limit (enough for a few years, but potentially risky). It now uses the browser's modern IndexedDB system, which allows it to use available space on your device, meaning you can record millions of transactions without ever running out of room. Existing data is migrated automatically behind the scenes.
+
+---
+
 ## [Storage] Persistent Storage Request + Numbered Backup Filenames
 
 - **Date**: 2026-07-31

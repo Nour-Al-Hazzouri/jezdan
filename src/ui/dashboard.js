@@ -22,8 +22,8 @@ function formatDate(timestamp) {
   });
 }
 
-export function renderDashboard() {
-  const balances = getBalances();
+export async function renderDashboard() {
+  const balances = await getBalances();
 
   // Render Balances
   const elUsdBalance = document.getElementById("usd-balance");
