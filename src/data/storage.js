@@ -1,10 +1,12 @@
 import { calculateNetEffect } from "./calculation.js";
+import { triggerAutoBackup } from "./telegram.js";
 
 const KEYS = {
   TRANSACTIONS: "jezdan_transactions",
   BALANCES: "jezdan_balances",
   OPENING_BALANCES: "jezdan_opening_balances",
   EXCHANGE_RATE: "jezdan_exchange_rate",
+  TELEGRAM_CONFIG: "jezdan_telegram_config",
 };
 
 const DB_NAME = "jezdan_db";
@@ -110,6 +112,7 @@ export async function setOpeningBalances(usd, lbp) {
     lbp: Number(lbp) || 0,
   });
   await recalculateBalances();
+  triggerAutoBackup();
 }
 
 export async function getTransactions() {
@@ -140,6 +143,7 @@ export async function addTransaction(tx) {
   balances.lbp += newTx.netLBP;
   await writeData(KEYS.BALANCES, balances);
 
+  triggerAutoBackup();
   return newTx;
 }
 
@@ -176,6 +180,7 @@ export async function updateTransaction(id, updatedTx) {
   balances.lbp += diffLBP;
   await writeData(KEYS.BALANCES, balances);
 
+  triggerAutoBackup();
   return newTx;
 }
 
@@ -192,6 +197,7 @@ export async function deleteTransaction(id) {
   balances.usd -= txToDelete.netUSD;
   balances.lbp -= txToDelete.netLBP;
   await writeData(KEYS.BALANCES, balances);
+  triggerAutoBackup();
 }
 
 export async function getExchangeRate() {
@@ -224,4 +230,17 @@ export async function importData(json) {
   );
   // Recalculate from scratch to ensure balances are consistent
   await recalculateBalances();
+  triggerAutoBackup();
+}
+
+export async function getTelegramConfig() {
+  return await readData(KEYS.TELEGRAM_CONFIG, {
+    enabled: false,
+    botToken: "",
+    chatId: "",
+  });
+}
+
+export async function setTelegramConfig(config) {
+  await writeData(KEYS.TELEGRAM_CONFIG, config);
 }

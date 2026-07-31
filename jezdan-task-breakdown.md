@@ -58,8 +58,27 @@ All 7 original tasks are done and committed to the `dev` branch.
 
 ---
 
+## Task 9 — Optional Telegram Auto-Backup
+
+**Goal:** Allow users to optionally configure a Telegram Bot Token and Chat ID to automatically receive a `.json` backup file in their Telegram chat whenever data is created, edited, or deleted.
+
+### Scope
+
+- **Settings UI additions:**
+  - Toggle switch to enable/disable Telegram Auto-Backup.
+  - Password-style inputs for `Bot Token` and `Chat ID` with `👁️` show/hide buttons.
+  - Help button `?` that opens an inline step-by-step modal guide (from A to Z) for non-technical users.
+  - `Test Connection` button to verify credentials via `sendMessage` before saving.
+- **Data & Sync Layer:**
+  - Save Telegram settings in `IndexedDB`.
+  - Non-blocking background sync function (`sendTelegramBackup()`) that posts `.json` files to `https://api.telegram.org/bot<TOKEN>/sendDocument`.
+- **Security:**
+  - Zero hard-coded tokens or keys. Credentials are provided solely by the user and stored in their local device database.
+
+---
+
 ## How to run new sessions
 
-- Point the agent at `src/ui/history.js`, `src/ui/styles.css`, and this file.
-- Tell it: _"We're on Task 8. Rewrite `renderHistory()` in `history.js` to group transactions by month with income/outcome totals in the header. Don't modify any other files unless strictly necessary."_
+- Point the agent at `src/ui/settings.js`, `src/data/telegram.js` (or `storage.js`), `src/ui/styles.css`, and this file.
+- Tell it: _"We're on Task 9. Implement optional Telegram auto-backup in Settings with step-by-step setup modal, show/hide password inputs, connection testing, and background document dispatch on changes."_
 - After task, commit before moving to anything new.

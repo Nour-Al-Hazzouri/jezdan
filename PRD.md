@@ -76,14 +76,14 @@ Single form, opened via one prominent "+" button:
 2. **Add Transaction** (described above).
 3. **Transaction History**: full scrollable list of all transactions, each tappable to view/edit/delete.
 4. **Settings**:
-   - Set/edit exchange rate.
    - Set/edit opening balances for USD and LBP wallets (for initial setup or corrections).
-   - Choose preferred display currency for the combined total (USD or LBP).
+   - Local JSON backup & restore export/import.
+   - Optional Telegram Auto-Backup (Bot Token + Chat ID setup for instant cloud copy on updates).
 
 ### Explicitly OUT of scope for v1 (do not build, keep it lean)
 
 - No categories or budgets.
-- No bank sync, no live exchange rate API, no cloud sync, no accounts/login.
+- No central backend servers, no live exchange rate API, no mandatory user accounts/login (optional Telegram Bot API allowed for zero-server cloud backups).
 - No charts/analytics beyond the simple balance + history view (can be added later).
 - No recurring transactions.
 
