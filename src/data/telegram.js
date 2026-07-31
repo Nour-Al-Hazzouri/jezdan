@@ -22,8 +22,12 @@ export async function sendTelegramMessage(token, chatId, text) {
 export async function sendTelegramDocument(token, chatId, dataObject) {
   const json = JSON.stringify(dataObject, null, 2);
   const blob = new Blob([json], { type: "application/json" });
-  const date = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
-  const filename = `jezdan-backup-${date}.json`;
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const counterKey = `jezdan_backup_counter_${dateStr}`;
+  const n = parseInt(localStorage.getItem(counterKey) || "0", 10) + 1;
+  localStorage.setItem(counterKey, n);
+  const seq = String(n).padStart(3, "0");
+  const filename = `jezdan-backup-${dateStr}-${seq}.json`;
 
   const form = new FormData();
   form.append("chat_id", chatId);

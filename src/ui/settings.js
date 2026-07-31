@@ -10,7 +10,7 @@ import { sendTelegramMessage } from "../data/telegram.js";
 import { renderDashboard } from "./dashboard.js";
 
 // ── Custom themed confirm dialog (replaces window.confirm) ──
-function showConfirmDialog(title, message) {
+export function showConfirmDialog(title, message) {
   return new Promise((resolve) => {
     const dialog = document.getElementById("confirm-dialog");
     document.getElementById("confirm-title").textContent = title;
