@@ -195,14 +195,14 @@ export function initSettingsUI() {
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    const date = new Date().toISOString().slice(0, 10);
-    // Increment a per-day counter so filenames are YYYY-MM-DD-NNN (e.g. 2026-07-31-003)
-    const counterKey = `jezdan_backup_counter_${date}`;
+    const dateStr = new Date().toISOString().slice(0, 10);
+    // Shared counter with Telegram backups so both use the same YYYY-MM-DD-NNN sequence
+    const counterKey = `jezdan_backup_counter_${dateStr}`;
     const n = parseInt(localStorage.getItem(counterKey) || "0", 10) + 1;
     localStorage.setItem(counterKey, n);
     const seq = String(n).padStart(3, "0");
     a.href = url;
-    a.download = `jezdan-backup-${date}-${seq}.json`;
+    a.download = `jezdan-backup-${dateStr}-${seq}.json`;
     a.click();
     URL.revokeObjectURL(url);
   });
