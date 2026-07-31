@@ -61,11 +61,8 @@ export function initHistoryUI() {
     if (txs.length === 0) {
       listContainer.innerHTML =
         '<li class="empty-state">No transactions yet</li>';
-      btnOpen.style.display = "none";
       return;
     }
-
-    btnOpen.style.display = "block";
     listContainer.innerHTML = "";
 
     const groups = groupByMonth(txs);
