@@ -15,6 +15,8 @@
 - **Modified**: `PRD.md` — Updated Settings and scope sections to reflect optional Telegram Auto-Backup.
 - **Modified**: `jezdan-task-breakdown.md` — Added Task 9 (Telegram Auto-Backup) scope and instructions.
 - **Polish**: Moved "Save Changes" button in Settings below Data Backup. Replaced `window.confirm()` in `history.js` with the new custom themed dialog for deleting transactions. Unified Telegram backup filename sequence format with the local file exporter (`YYYY-MM-DD-NNN.json`).
+- **Fix**: Removed `-webkit-tap-highlight-color` across all elements in `styles.css` to eliminate the ugly blue selection glitch when tapping buttons on mobile.
+- **Fix**: Removed logic in `history.js` that hid the "View Transaction History" button when the list was empty, fixing a bug where deleting the last entry caused the button to disappear permanently until refresh.
 - **Why**: Browser storage (localStorage, IndexedDB) can be wiped by "Clear Site Data" and there is no browser API to prevent it. Telegram Bot API provides free, permanent, zero-server cloud storage that users control entirely with their own bot credentials. The custom confirm dialog replaces the jarring browser-native `window.confirm()` which doesn't follow the app's dark theme.
 
 ### Plain English Summary
