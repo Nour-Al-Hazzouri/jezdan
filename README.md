@@ -18,11 +18,13 @@ Standard personal finance apps (like Cashew, YNAB, or pocket trackers) are not b
 
 - **Single-Entry Mixed Currency Logging:** Log payments and received change across USD and LBP simultaneously in one entry.
 - **Dual Wallet Tracking:** Automatically maintains and updates running balances for both your USD and LBP wallets.
-- **Enforced UI Constraints:** Intelligently prevents duplicate currency rows (e.g. locks currency inputs to ensure you choose one USD and one LBP row when recording mixed entries).
-- **Calendar & Monthly View:** Organizes transactions month-by-month with a simple calendar interface and automatically calculates monthly income vs. outcome.
-- **Offline-First PWA:** Works 100% offline via Service Worker caching. Installable directly to your phone's home screen.
-- **Local-Only Privacy:** 100% client-side. All data is saved on-device via `localStorage`—no servers, no accounts, and no tracking.
-- **Data Export & Import:** Backup your entire database to a JSON file to prevent data loss or transfer it to another device.
+- **Enforced UI Constraints:** Intelligently prevents duplicate currency rows (e.g. locks currency inputs to ensure one USD and one LBP row when recording mixed entries).
+- **Monthly History View:** Organizes transactions month-by-month with monthly income vs. outcome totals.
+- **Offline-First PWA:** Works 100% offline via Service Worker caching. Installable directly to your phone's home screen via "Add to Home Screen."
+- **Local-Only Privacy:** 100% client-side. All data is saved on-device via `IndexedDB` — no servers, no accounts, and no tracking.
+- **Data Export & Import:** Backup your entire transaction history to a dated, numbered `.json` file (`YYYY-MM-DD-NNN` format) and restore it at any time.
+- **Optional Telegram Auto-Backup:** Connect a Telegram bot (Bot Token + Chat ID) to automatically receive a backup file in your Telegram chat on every transaction change. Free, permanent, zero-server cloud storage you control.
+- **Themed Confirm Dialogs:** All confirmation prompts (restore backup, delete transaction) use a custom-styled dialog matching the app's dark teal/gold theme.
 
 ---
 
@@ -30,10 +32,11 @@ Standard personal finance apps (like Cashew, YNAB, or pocket trackers) are not b
 
 Jezdan is built with a minimal, modern, and lightweight tech stack to optimize performance and offline-caching efficiency:
 
-- **Core Structure & Logic:** Semantic HTML5, Vanilla JavaScript (ES Modules), and modern CSS3 (using custom properties, HSL color palettes, and responsive CSS Grid/Flexbox layouts).
-- **Service Worker & PWA:** Custom service worker (`sw.js`) with cache-busting and stale-while-revalidate caching strategies for reliable offline capabilities.
-- **Data Storage:** Local browser storage (`localStorage`) for local-only, zero-latency persistence.
+- **Core Structure & Logic:** Semantic HTML5, Vanilla JavaScript (ES Modules), and modern CSS3 (custom properties, Flexbox layouts).
+- **Service Worker & PWA:** Custom service worker (`sw.js`) with stale-while-revalidate caching for reliable offline capabilities and automatic background updates.
+- **Data Storage:** `IndexedDB` for all transaction and settings data (automatically migrated from `localStorage` on first run). `localStorage` is retained only for the per-day backup sequence counter.
 - **Build/Bundling Pipeline:** Webpack and `webpack-merge` for environment configuration splits (development, production, common).
+- **Deployment:** GitHub Pages via `gh-pages` npm package.
 
 ---
 
@@ -44,3 +47,4 @@ The UI is optimized for mobile screens (Android/iOS) with a sleek dark-mode-firs
 - **Primary Color:** Deep emerald green/teal, representing money and security.
 - **Accent Color:** Warm amber/gold, a subtle nod to Lebanese visual identity.
 - **Typography:** Modern, clean sans-serif typography with large, legible financial figures front and center.
+- **Interactions:** Micro-animations on all buttons, gold focus rings on inputs, no native tap highlights on mobile.
