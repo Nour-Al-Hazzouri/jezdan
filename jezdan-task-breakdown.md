@@ -1,27 +1,40 @@
 # Jezdan Build Plan — Task Tracker
 
-## Completed Tasks
+## Status
 
-All 7 original tasks are done and committed to the `dev` branch.
+All 9 tasks are complete and committed to the `dev` branch.
 
-| Task                         | Status  | Summary                                                    |
-| ---------------------------- | ------- | ---------------------------------------------------------- |
-| Task 1 — PWA Scaffold        | ✅ Done | Manifest, service worker, offline caching, teal/gold theme |
-| Task 2 — Data Layer          | ✅ Done | `storage.js` + `calculation.js`, pure logic, no DOM        |
-| Task 3 — Add Transaction     | ✅ Done | Dialog form, mixed-currency rows, wired to data layer      |
-| Task 4 — Dashboard           | ✅ Done | Wallet cards, FAB, live balance rendering                  |
-| Task 5 — Transaction History | ✅ Done | Full list, Edit/Delete with balance rollback               |
-| Task 6 — Settings            | ✅ Done | Opening balances, backup/restore JSON, label fix           |
-| Task 7 — Polish Pass         | ✅ Done | Micro-animations, focus rings, legibility, contrast        |
-| Bonus — Backup/Import        | ✅ Done | Full JSON export/import in Settings dialog                 |
+| Task                          | Status  | Summary                                                               |
+| ----------------------------- | ------- | --------------------------------------------------------------------- |
+| Task 1 — PWA Scaffold         | ✅ Done | Manifest, service worker, offline caching, teal/gold theme            |
+| Task 2 — Data Layer           | ✅ Done | `storage.js` + `calculation.js`, pure logic, no DOM                   |
+| Task 3 — Add Transaction      | ✅ Done | Dialog form, mixed-currency rows, wired to data layer                 |
+| Task 4 — Dashboard            | ✅ Done | Wallet cards, FAB, live balance rendering                             |
+| Task 5 — Transaction History  | ✅ Done | Full list, Edit/Delete with balance rollback                          |
+| Task 6 — Settings             | ✅ Done | Opening balances, data backup/restore JSON                            |
+| Task 7 — Polish Pass          | ✅ Done | Micro-animations, focus rings, legibility, contrast                   |
+| Task 8 — Grouped History View | ✅ Done | Month-grouped list with income/outcome totals per month               |
+| Task 9 — Telegram Auto-Backup | ✅ Done | Optional Telegram bot backup on every mutation, themed confirm dialog |
+
+---
+
+## Bonus Changes (post-task)
+
+| Change                        | Status  | Summary                                                                 |
+| ----------------------------- | ------- | ----------------------------------------------------------------------- |
+| IndexedDB Migration           | ✅ Done | Replaced localStorage with IndexedDB; automatic migration on first read |
+| Persistent Storage Request    | ✅ Done | `navigator.storage.persist()` called on startup                         |
+| Numbered Backup Filenames     | ✅ Done | `YYYY-MM-DD-NNN` format, shared counter between manual & Telegram       |
+| Mobile Tap Highlight Fix      | ✅ Done | `-webkit-tap-highlight-color: transparent` added globally               |
+| History Button Visibility Fix | ✅ Done | Button no longer hides when the transaction list is empty               |
 
 ---
 
 ## Task 8 — Grouped History View (Calendar-style)
 
-**Goal:** Replace the flat history list with a month-grouped view that shows income/outcome totals per month and day labels per transaction.
+**Status: ✅ Complete**
 
-**Design decision (ponytail rule):** No grid calendar. A grouped scrollable list gives all the information (which day, which month, which year, monthly totals) with zero extra state, zero extra navigation, and zero extra dialogs. This is the correct minimal solution.
+**Goal:** Replace the flat history list with a month-grouped view that shows income/outcome totals per month and day labels per transaction.
 
 ### What it looks like
 
@@ -37,48 +50,34 @@ All 7 original tasks are done and committed to the `dev` branch.
    ...
 ```
 
-### Files to modify
+### Files modified
 
-- `src/ui/history.js` — Rewrite `renderHistory()` to group transactions by `YYYY-MM` and emit month-header rows with totals.
-- `src/ui/styles.css` — Add ~15 lines of month-group header styles.
-- Everything else — untouched.
-
-### Scope boundary
-
-- **In:** Month groups, weekday + date labels, income/outcome totals per month (USD and LBP separately).
-- **Out:** Grid calendar, tap-to-expand day cells, month navigation arrows, charts/bars. These can be added later if needed, but they are not minimal.
-
-### Verify
-
-1. Open Transaction History dialog.
-2. Transactions are grouped under month headers (newest month first).
-3. Each month header shows correct sum of positive `netUSD`/`netLBP` (income) and sum of negative (outcome).
-4. Individual transaction rows show weekday + date.
-5. Edit/Delete still work identically.
+- `src/ui/history.js` — Rewrote `renderHistory()` to group transactions by `YYYY-MM` and emit month-header rows with totals.
+- `src/ui/styles.css` — Added month-group header styles.
 
 ---
 
 ## Task 9 — Optional Telegram Auto-Backup
 
+**Status: ✅ Complete**
+
 **Goal:** Allow users to optionally configure a Telegram Bot Token and Chat ID to automatically receive a `.json` backup file in their Telegram chat whenever data is created, edited, or deleted.
 
-### Scope
+### What was built
 
 - **Settings UI additions:**
   - Toggle switch to enable/disable Telegram Auto-Backup.
   - Password-style inputs for `Bot Token` and `Chat ID` with `👁️` show/hide buttons.
   - Help button `?` that opens an inline step-by-step modal guide (from A to Z) for non-technical users.
   - `Test Connection` button to verify credentials via `sendMessage` before saving.
-- **Data & Sync Layer:**
-  - Save Telegram settings in `IndexedDB`.
-  - Non-blocking background sync function (`sendTelegramBackup()`) that posts `.json` files to `https://api.telegram.org/bot<TOKEN>/sendDocument`.
+  - `Save Changes` button moved to the bottom of the Settings dialog.
+- **Data & Sync Layer (`src/data/telegram.js`):**
+  - `sendTelegramMessage()` — test connection.
+  - `sendTelegramDocument()` — uploads the `.json` backup file.
+  - `triggerAutoBackup()` — fire-and-forget wrapper; silent fail on network error.
+  - Backup filenames follow the same `YYYY-MM-DD-NNN` convention as manual exports, using a shared per-day counter.
+- **Custom Confirm Dialog:**
+  - `showConfirmDialog()` exported from `settings.js` and used by both the restore flow in settings and the delete flow in `history.js`.
+  - Replaces all native `window.confirm()` calls with a custom-themed `<dialog>` matching the app's dark teal/gold aesthetic.
 - **Security:**
-  - Zero hard-coded tokens or keys. Credentials are provided solely by the user and stored in their local device database.
-
----
-
-## How to run new sessions
-
-- Point the agent at `src/ui/settings.js`, `src/data/telegram.js` (or `storage.js`), `src/ui/styles.css`, and this file.
-- Tell it: _"We're on Task 9. Implement optional Telegram auto-backup in Settings with step-by-step setup modal, show/hide password inputs, connection testing, and background document dispatch on changes."_
-- After task, commit before moving to anything new.
+  - Zero hard-coded tokens or keys. Credentials are provided solely by the user and stored in their local IndexedDB.
