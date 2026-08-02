@@ -53,9 +53,30 @@ export async function triggerAutoBackup() {
     if (!config || !config.enabled || !config.botToken || !config.chatId)
       return;
     const data = await exportData();
-    await sendTelegramDocument(config.botToken, config.chatId, data);
+    const result = await sendTelegramDocument(
+      config.botToken,
+      config.chatId,
+      data,
+    );
+    if (result && result.ok) {
+      localStorage.removeItem("jezdan_pending_backup");
+    } else {
+      localStorage.setItem("jezdan_pending_backup", "true");
+    }
   } catch (e) {
     // Silent fail — user may be offline, that's fine
     console.warn("Telegram auto-backup failed:", e.message);
+    localStorage.setItem("jezdan_pending_backup", "true");
+  }
+}
+
+/**
+ * If there is a pending backup from an offline mutation, trigger it now.
+ */
+export async function processOfflineBackupQueue() {
+  if (localStorage.getItem("jezdan_pending_backup") === "true") {
+    if (navigator.onLine === false) return;
+    console.log("Jezdan: Retrying pending offline backup...");
+    await triggerAutoBackup();
   }
 }
