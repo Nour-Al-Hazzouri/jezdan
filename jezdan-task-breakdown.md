@@ -20,13 +20,14 @@ All 9 tasks are complete and committed to the `dev` branch.
 
 ## Bonus Changes (post-task)
 
-| Change                        | Status  | Summary                                                                 |
-| ----------------------------- | ------- | ----------------------------------------------------------------------- |
-| IndexedDB Migration           | ✅ Done | Replaced localStorage with IndexedDB; automatic migration on first read |
-| Persistent Storage Request    | ✅ Done | `navigator.storage.persist()` called on startup                         |
-| Numbered Backup Filenames     | ✅ Done | `YYYY-MM-DD-NNN` format, shared counter between manual & Telegram       |
-| Mobile Tap Highlight Fix      | ✅ Done | `-webkit-tap-highlight-color: transparent` added globally               |
-| History Button Visibility Fix | ✅ Done | Button no longer hides when the transaction list is empty               |
+| Change                        | Status  | Summary                                                                   |
+| ----------------------------- | ------- | ------------------------------------------------------------------------- |
+| IndexedDB Migration           | ✅ Done | Replaced localStorage with IndexedDB; automatic migration on first read   |
+| Persistent Storage Request    | ✅ Done | `navigator.storage.persist()` called on startup                           |
+| Numbered Backup Filenames     | ✅ Done | `YYYY-MM-DD-NNN` format, shared counter between manual & Telegram         |
+| Mobile Tap Highlight Fix      | ✅ Done | `-webkit-tap-highlight-color: transparent` added globally                 |
+| History Button Visibility Fix | ✅ Done | Button no longer hides when the transaction list is empty                 |
+| Offline Backup Queue          | ✅ Done | Saves a localStorage flag on failure; retries on startup and online event |
 
 ---
 

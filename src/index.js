@@ -6,6 +6,8 @@ import { renderDashboard } from "./ui/dashboard.js";
 import { initHistoryUI } from "./ui/history.js";
 import { initSettingsUI } from "./ui/settings.js";
 
+import { processOfflineBackupQueue } from "./data/telegram.js";
+
 // Expose data layer for console testing and verification
 // ponytail: Attached to window to avoid dead code tree-shaking and enable manual verification in browser devtools.
 window.Jezdan = { storage, calculation };
@@ -15,6 +17,10 @@ initAddTransactionUI();
 initHistoryUI();
 initSettingsUI();
 renderDashboard();
+
+// Process any pending backups from offline usage
+processOfflineBackupQueue();
+window.addEventListener("online", processOfflineBackupQueue);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

@@ -1,5 +1,22 @@
 # Changes
 
+## [Feature] Offline Backup Retry Queue
+
+- **Date**: 2026-08-02
+- **Technical Summary**: Added an offline queue mechanism to retry failed Telegram auto-backups once network connectivity is restored.
+
+### Technical Log
+
+- **Modified**: `src/data/telegram.js` — Updated `triggerAutoBackup()` to set a `jezdan_pending_backup: true` flag in `localStorage` if the network request fails or returns a bad status. Added `processOfflineBackupQueue()` to check the flag and retry sending the backup if the device is online.
+- **Modified**: `src/index.js` — Imported and executed `processOfflineBackupQueue()` at application startup and hooked it to the window's `online` event listener.
+- **Why**: Since Jezdan is an offline-first app, mutations made without an internet connection would miss the Telegram auto-backup. Queueing the backup request on failure ensures that the latest state is eventually uploaded when the user reconnects.
+
+### Plain English Summary
+
+If you make changes to your transactions while offline, the app will now automatically save a "pending backup" flag. The next time you open the app or get your internet connection back, it will automatically sync and upload the backup to your Telegram bot.
+
+---
+
 ## [Feature] Telegram Auto-Backup + Custom Confirm Dialog
 
 - **Date**: 2026-08-01
