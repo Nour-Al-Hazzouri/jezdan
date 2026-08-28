@@ -7,6 +7,7 @@ const KEYS = {
   OPENING_BALANCES: "jezdan_opening_balances",
   EXCHANGE_RATE: "jezdan_exchange_rate",
   TELEGRAM_CONFIG: "jezdan_telegram_config",
+  MONTHLY_ESTIMATES: "jezdan_monthly_estimates",
 };
 
 const DB_NAME = "jezdan_db";
@@ -208,6 +209,234 @@ export async function setExchangeRate(rate) {
   await writeData(KEYS.EXCHANGE_RATE, Number(rate));
 }
 
+// ── Monthly Estimates (Upcoming Month Projection) ──
+
+export function getUpcomingMonthKey(date = new Date()) {
+  const next = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+  const yyyy = next.getFullYear();
+  const mm = String(next.getMonth() + 1).padStart(2, "0");
+  return `${yyyy}-${mm}`;
+}
+
+export async function getMonthlyEstimates() {
+  return await readData(KEYS.MONTHLY_ESTIMATES, []);
+}
+
+function getItemAmounts(item) {
+  if (Array.isArray(item.amounts) && item.amounts.length > 0) {
+    return item.amounts;
+  }
+  if (item.amount !== undefined && item.currency) {
+    return [{ amount: Number(item.amount) || 0, currency: item.currency }];
+  }
+  return [];
+}
+
+export async function addMonthlyEstimate(estimate) {
+  const amounts =
+    Array.isArray(estimate.amounts) && estimate.amounts.length > 0
+      ? estimate.amounts.map((a) => ({
+          amount: Number(a.amount) || 0,
+          currency: a.currency || "USD",
+        }))
+      : [
+          {
+            amount: Number(estimate.amount) || 0,
+            currency: estimate.currency || "USD",
+          },
+        ];
+
+  const newEst = {
+    id: generateId(),
+    type: estimate.type || "expense",
+    note: estimate.note || "",
+    amounts,
+    amount: amounts[0]?.amount || 0,
+    currency: amounts[0]?.currency || "USD",
+    skippedForMonth: null,
+    tempOverride: null, // { amounts: [{ amount, currency }], month: string }
+  };
+
+  const list = await getMonthlyEstimates();
+  list.push(newEst);
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return newEst;
+}
+
+export async function updateMonthlyEstimate(id, updated) {
+  const list = await getMonthlyEstimates();
+  const idx = list.findIndex((e) => e.id === id);
+  if (idx === -1) return null;
+
+  const amounts =
+    Array.isArray(updated.amounts) && updated.amounts.length > 0
+      ? updated.amounts.map((a) => ({
+          amount: Number(a.amount) || 0,
+          currency: a.currency || "USD",
+        }))
+      : updated.amount !== undefined
+        ? [
+            {
+              amount: Number(updated.amount) || 0,
+              currency: updated.currency || list[idx].currency || "USD",
+            },
+          ]
+        : list[idx].amounts || [
+            {
+              amount: Number(list[idx].amount) || 0,
+              currency: list[idx].currency || "USD",
+            },
+          ];
+
+  list[idx] = {
+    ...list[idx],
+    type: updated.type || list[idx].type,
+    note: updated.note !== undefined ? updated.note : list[idx].note,
+    amounts,
+    amount: amounts[0]?.amount || 0,
+    currency: amounts[0]?.currency || "USD",
+  };
+
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return list[idx];
+}
+
+export async function setMonthlyEstimateTempOverride(id, tempAmounts) {
+  const list = await getMonthlyEstimates();
+  const item = list.find((e) => e.id === id);
+  if (!item) return null;
+
+  const targetMonth = getUpcomingMonthKey();
+  const amounts = Array.isArray(tempAmounts)
+    ? tempAmounts.map((a) => ({
+        amount: Number(a.amount) || 0,
+        currency: a.currency || "USD",
+      }))
+    : [
+        {
+          amount: Number(tempAmounts) || 0,
+          currency: item.amounts?.[0]?.currency || item.currency || "USD",
+        },
+      ];
+
+  item.tempOverride = {
+    amounts,
+    amount: amounts[0]?.amount || 0,
+    month: targetMonth,
+  };
+
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return item;
+}
+
+export async function clearMonthlyEstimateTempOverride(id) {
+  const list = await getMonthlyEstimates();
+  const item = list.find((e) => e.id === id);
+  if (!item) return null;
+
+  item.tempOverride = null;
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return item;
+}
+
+export async function toggleSkipMonthlyEstimate(id) {
+  const list = await getMonthlyEstimates();
+  const item = list.find((e) => e.id === id);
+  if (!item) return null;
+
+  const targetMonth = getUpcomingMonthKey();
+  if (item.skippedForMonth === targetMonth) {
+    item.skippedForMonth = null;
+  } else {
+    item.skippedForMonth = targetMonth;
+  }
+
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return item;
+}
+
+export async function deleteMonthlyEstimate(id) {
+  let list = await getMonthlyEstimates();
+  list = list.filter((e) => e.id !== id);
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+}
+
+export async function getEstimatedBalances() {
+  const currentBalances = await getBalances();
+  const estimates = await getMonthlyEstimates();
+  const targetMonth = getUpcomingMonthKey();
+
+  let incomeUSD = 0;
+  let expenseUSD = 0;
+  let incomeLBP = 0;
+  let expenseLBP = 0;
+
+  for (const est of estimates) {
+    if (est.skippedForMonth === targetMonth) {
+      continue;
+    }
+
+    let effectiveAmounts = [];
+    if (est.tempOverride && est.tempOverride.month === targetMonth) {
+      if (Array.isArray(est.tempOverride.amounts)) {
+        effectiveAmounts = est.tempOverride.amounts;
+      } else if (est.tempOverride.amount !== undefined) {
+        effectiveAmounts = [
+          {
+            amount: est.tempOverride.amount,
+            currency: est.amounts?.[0]?.currency || est.currency || "USD",
+          },
+        ];
+      }
+    } else {
+      effectiveAmounts = getItemAmounts(est);
+    }
+
+    for (const a of effectiveAmounts) {
+      const amt = Number(a.amount) || 0;
+      if (a.currency === "USD") {
+        if (est.type === "income") {
+          incomeUSD += amt;
+        } else {
+          expenseUSD += amt;
+        }
+      } else if (a.currency === "LBP") {
+        if (est.type === "income") {
+          incomeLBP += amt;
+        } else {
+          expenseLBP += amt;
+        }
+      }
+    }
+  }
+
+  const netUSD = incomeUSD - expenseUSD;
+  const netLBP = incomeLBP - expenseLBP;
+
+  const projectedUSD = currentBalances.usd + netUSD;
+  const projectedLBP = currentBalances.lbp + netLBP;
+
+  return {
+    currentBalances,
+    projectedBalances: { usd: projectedUSD, lbp: projectedLBP },
+    upcomingMonthKey: targetMonth,
+    totals: {
+      incomeUSD,
+      expenseUSD,
+      netUSD,
+      incomeLBP,
+      expenseLBP,
+      netLBP,
+    },
+  };
+}
+
 export async function exportData() {
   return {
     version: 1,
@@ -215,6 +444,7 @@ export async function exportData() {
     transactions: await getTransactions(),
     openingBalances: await getOpeningBalances(),
     balances: await getBalances(),
+    monthlyEstimates: await getMonthlyEstimates(),
   };
 }
 
@@ -228,6 +458,9 @@ export async function importData(json) {
     KEYS.OPENING_BALANCES,
     json.openingBalances || { usd: 0, lbp: 0 },
   );
+  if (Array.isArray(json.monthlyEstimates)) {
+    await writeData(KEYS.MONTHLY_ESTIMATES, json.monthlyEstimates);
+  }
   // Recalculate from scratch to ensure balances are consistent
   await recalculateBalances();
   triggerAutoBackup();

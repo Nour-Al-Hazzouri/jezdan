@@ -589,3 +589,221 @@ dialog h2 {
   justify-content: center;
   margin-top: 0;
 }
+
+/* ── Monthly Estimation Feature ── */
+.btn-estimate-fab {
+  position: fixed;
+  bottom: 6.25rem;
+  right: 2rem;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background-color: var(--secondary-color);
+  border: 1.5px solid var(--accent-color);
+  color: var(--text-primary);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    background-color var(--transition);
+}
+.btn-estimate-fab:hover {
+  background-color: var(--primary-color);
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(255, 183, 3, 0.3);
+}
+
+.estimate-content {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-right: 0.25rem;
+}
+
+.estimate-summary-card {
+  background: var(--primary-color);
+  border: 1.5px solid rgba(255, 183, 3, 0.35);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.estimate-projected-balances {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.est-balance-box {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.75rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.est-curr-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  letter-spacing: 1px;
+}
+
+.est-balance-box h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.est-sub-detail {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.estimate-form-card {
+  background: var(--primary-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.estimate-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.estimate-form-header h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.estimate-type-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-type-toggle {
+  flex: 1;
+  padding: 0.55rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(163, 184, 181, 0.3);
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.btn-type-toggle.active[data-type="expense"] {
+  background: rgba(248, 113, 113, 0.15);
+  border-color: #f87171;
+  color: #f87171;
+}
+
+.btn-type-toggle.active[data-type="income"] {
+  background: rgba(74, 222, 128, 0.15);
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.estimate-list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.section-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.section-title-row h3 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.estimate-item.item-skipped {
+  opacity: 0.55;
+  border-color: rgba(248, 113, 113, 0.25);
+}
+
+.estimate-item.item-skipped .tx-note,
+.estimate-item.item-skipped .tx-amounts {
+  text-decoration: line-through;
+}
+
+.estimate-item.item-temp-override {
+  border-color: rgba(255, 183, 3, 0.4);
+  background: rgba(255, 183, 3, 0.04);
+}
+
+.est-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.est-type-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.est-type-tag.expense {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.est-type-tag.income {
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+}
+
+.est-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+  display: inline-block;
+}
+
+.est-badge-skipped {
+  color: #f87171;
+}
+
+.est-badge-temp {
+  color: var(--accent-color);
+}
+
+.est-actions {
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
