@@ -7,6 +7,7 @@ const KEYS = {
   OPENING_BALANCES: "jezdan_opening_balances",
   EXCHANGE_RATE: "jezdan_exchange_rate",
   TELEGRAM_CONFIG: "jezdan_telegram_config",
+  MONTHLY_ESTIMATES: "jezdan_monthly_estimates",
 };
 
 const DB_NAME = "jezdan_db";
@@ -208,6 +209,163 @@ export async function setExchangeRate(rate) {
   await writeData(KEYS.EXCHANGE_RATE, Number(rate));
 }
 
+// ── Monthly Estimates (Upcoming Month Projection) ──
+
+export function getUpcomingMonthKey(date = new Date()) {
+  const next = new Date(date.getFullYear(), date.getMonth() + 1, 1);
+  const yyyy = next.getFullYear();
+  const mm = String(next.getMonth() + 1).padStart(2, "0");
+  return `${yyyy}-${mm}`;
+}
+
+export async function getMonthlyEstimates() {
+  return await readData(KEYS.MONTHLY_ESTIMATES, []);
+}
+
+export async function addMonthlyEstimate(estimate) {
+  const newEst = {
+    id: generateId(),
+    type: estimate.type || "expense",
+    note: estimate.note || "",
+    amount: Number(estimate.amount) || 0,
+    currency: estimate.currency || "USD",
+    skippedForMonth: null,
+    tempOverride: null, // { amount: number, month: string }
+  };
+
+  const list = await getMonthlyEstimates();
+  list.push(newEst);
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return newEst;
+}
+
+export async function updateMonthlyEstimate(id, updated) {
+  const list = await getMonthlyEstimates();
+  const idx = list.findIndex((e) => e.id === id);
+  if (idx === -1) return null;
+
+  list[idx] = {
+    ...list[idx],
+    type: updated.type || list[idx].type,
+    note: updated.note !== undefined ? updated.note : list[idx].note,
+    amount:
+      updated.amount !== undefined ? Number(updated.amount) : list[idx].amount,
+    currency: updated.currency || list[idx].currency,
+  };
+
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return list[idx];
+}
+
+export async function setMonthlyEstimateTempOverride(id, tempAmount) {
+  const list = await getMonthlyEstimates();
+  const item = list.find((e) => e.id === id);
+  if (!item) return null;
+
+  const targetMonth = getUpcomingMonthKey();
+  item.tempOverride = {
+    amount: Number(tempAmount) || 0,
+    month: targetMonth,
+  };
+
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return item;
+}
+
+export async function clearMonthlyEstimateTempOverride(id) {
+  const list = await getMonthlyEstimates();
+  const item = list.find((e) => e.id === id);
+  if (!item) return null;
+
+  item.tempOverride = null;
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return item;
+}
+
+export async function toggleSkipMonthlyEstimate(id) {
+  const list = await getMonthlyEstimates();
+  const item = list.find((e) => e.id === id);
+  if (!item) return null;
+
+  const targetMonth = getUpcomingMonthKey();
+  if (item.skippedForMonth === targetMonth) {
+    item.skippedForMonth = null;
+  } else {
+    item.skippedForMonth = targetMonth;
+  }
+
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+  return item;
+}
+
+export async function deleteMonthlyEstimate(id) {
+  let list = await getMonthlyEstimates();
+  list = list.filter((e) => e.id !== id);
+  await writeData(KEYS.MONTHLY_ESTIMATES, list);
+  triggerAutoBackup();
+}
+
+export async function getEstimatedBalances() {
+  const currentBalances = await getBalances();
+  const estimates = await getMonthlyEstimates();
+  const targetMonth = getUpcomingMonthKey();
+
+  let incomeUSD = 0;
+  let expenseUSD = 0;
+  let incomeLBP = 0;
+  let expenseLBP = 0;
+
+  for (const est of estimates) {
+    if (est.skippedForMonth === targetMonth) {
+      continue;
+    }
+
+    let effectiveAmount = est.amount;
+    if (est.tempOverride && est.tempOverride.month === targetMonth) {
+      effectiveAmount = est.tempOverride.amount;
+    }
+
+    if (est.currency === "USD") {
+      if (est.type === "income") {
+        incomeUSD += effectiveAmount;
+      } else {
+        expenseUSD += effectiveAmount;
+      }
+    } else if (est.currency === "LBP") {
+      if (est.type === "income") {
+        incomeLBP += effectiveAmount;
+      } else {
+        expenseLBP += effectiveAmount;
+      }
+    }
+  }
+
+  const netUSD = incomeUSD - expenseUSD;
+  const netLBP = incomeLBP - expenseLBP;
+
+  const projectedUSD = currentBalances.usd + netUSD;
+  const projectedLBP = currentBalances.lbp + netLBP;
+
+  return {
+    currentBalances,
+    projectedBalances: { usd: projectedUSD, lbp: projectedLBP },
+    upcomingMonthKey: targetMonth,
+    totals: {
+      incomeUSD,
+      expenseUSD,
+      netUSD,
+      incomeLBP,
+      expenseLBP,
+      netLBP,
+    },
+  };
+}
+
 export async function exportData() {
   return {
     version: 1,
@@ -215,6 +373,7 @@ export async function exportData() {
     transactions: await getTransactions(),
     openingBalances: await getOpeningBalances(),
     balances: await getBalances(),
+    monthlyEstimates: await getMonthlyEstimates(),
   };
 }
 
@@ -228,6 +387,9 @@ export async function importData(json) {
     KEYS.OPENING_BALANCES,
     json.openingBalances || { usd: 0, lbp: 0 },
   );
+  if (Array.isArray(json.monthlyEstimates)) {
+    await writeData(KEYS.MONTHLY_ESTIMATES, json.monthlyEstimates);
+  }
   // Recalculate from scratch to ensure balances are consistent
   await recalculateBalances();
   triggerAutoBackup();

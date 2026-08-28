@@ -2,19 +2,20 @@
 
 ## Status
 
-All 9 tasks are complete and committed to the `dev` branch.
+All 10 tasks are complete and committed to the `dev` branch.
 
-| Task                          | Status  | Summary                                                               |
-| ----------------------------- | ------- | --------------------------------------------------------------------- |
-| Task 1 — PWA Scaffold         | ✅ Done | Manifest, service worker, offline caching, teal/gold theme            |
-| Task 2 — Data Layer           | ✅ Done | `storage.js` + `calculation.js`, pure logic, no DOM                   |
-| Task 3 — Add Transaction      | ✅ Done | Dialog form, mixed-currency rows, wired to data layer                 |
-| Task 4 — Dashboard            | ✅ Done | Wallet cards, FAB, live balance rendering                             |
-| Task 5 — Transaction History  | ✅ Done | Full list, Edit/Delete with balance rollback                          |
-| Task 6 — Settings             | ✅ Done | Opening balances, data backup/restore JSON                            |
-| Task 7 — Polish Pass          | ✅ Done | Micro-animations, focus rings, legibility, contrast                   |
-| Task 8 — Grouped History View | ✅ Done | Month-grouped list with income/outcome totals per month               |
-| Task 9 — Telegram Auto-Backup | ✅ Done | Optional Telegram bot backup on every mutation, themed confirm dialog |
+| Task                                 | Status  | Summary                                                               |
+| ------------------------------------ | ------- | --------------------------------------------------------------------- |
+| Task 1 — PWA Scaffold                | ✅ Done | Manifest, service worker, offline caching, teal/gold theme            |
+| Task 2 — Data Layer                  | ✅ Done | `storage.js` + `calculation.js`, pure logic, no DOM                   |
+| Task 3 — Add Transaction             | ✅ Done | Dialog form, mixed-currency rows, wired to data layer                 |
+| Task 4 — Dashboard                   | ✅ Done | Wallet cards, FAB, live balance rendering                             |
+| Task 5 — Transaction History         | ✅ Done | Full list, Edit/Delete with balance rollback                          |
+| Task 6 — Settings                    | ✅ Done | Opening balances, data backup/restore JSON                            |
+| Task 7 — Polish Pass                 | ✅ Done | Micro-animations, focus rings, legibility, contrast                   |
+| Task 8 — Grouped History View        | ✅ Done | Month-grouped list with income/outcome totals per month               |
+| Task 9 — Telegram Auto-Backup        | ✅ Done | Optional Telegram bot backup on every mutation, themed confirm dialog |
+| Task 10 — Monthly Balance Estimation | ✅ Done | Upcoming month balance estimation, month-scoped skip & temp overrides |
 
 ---
 
@@ -82,3 +83,25 @@ All 9 tasks are complete and committed to the `dev` branch.
   - Replaces all native `window.confirm()` calls with a custom-themed `<dialog>` matching the app's dark teal/gold aesthetic.
 - **Security:**
   - Zero hard-coded tokens or keys. Credentials are provided solely by the user and stored in their local IndexedDB.
+
+---
+
+## Task 10 — Monthly Balance Estimation
+
+**Status: ✅ Complete**
+
+**Goal:** Provide an upcoming month balance estimation tool based on recurring/expected monthly income and expenses, dynamically linked to live wallet balances and supporting month-scoped skip and temporary edit overrides.
+
+### What was built
+
+- **Floating Schedule Button & Dialog:**
+  - Added a secondary schedule FAB (`📅`) stacked above the `+` transaction button.
+  - Custom full-height `<dialog id="estimate-dialog">` displaying target month projection, breakdown details, add/edit form, and items list.
+- **Dynamic Live Balance Projection:**
+  - Projected upcoming month balance is calculated on top of current live balances (`getBalances()`). Any real transaction added/edited/deleted instantly reflects in next month's projection.
+- **Month-Scoped Skip & Temporary Edits:**
+  - **Skip**: Toggling skip marks the item for the upcoming month (`skippedForMonth: "YYYY-MM"`), excluding it from the projection. Can be unskipped anytime before that month arrives; expires naturally when the calendar advances.
+  - **Temporary Edit**: Users can override the expected amount for the upcoming month only (`tempOverride: { amount, month: "YYYY-MM" }`). Overrides can be undone or expire automatically after the month passes.
+  - **Permanent Edit & Delete**: Full CRUD to edit base amounts, notes, currencies, or permanently remove recurring items.
+- **Backup & Persistence Integration:**
+  - Estimate rules are stored in IndexedDB under `jezdan_monthly_estimates`, backed up in JSON export/import and Telegram auto-backup.

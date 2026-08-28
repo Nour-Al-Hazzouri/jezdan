@@ -42,7 +42,136 @@
         </section>
       </main>
 
+      <button
+        id="btn-open-estimate"
+        class="btn-primary btn-estimate-fab"
+        title="Monthly Estimation"
+      >
+        📅
+      </button>
       <button id="btn-open-add-tx" class="btn-primary">+</button>
+
+      <dialog id="estimate-dialog" class="full-dialog">
+        <div class="dialog-header">
+          <h2>Monthly Estimation</h2>
+          <button type="button" id="btn-close-estimate" class="btn-close">
+            &times;
+          </button>
+        </div>
+
+        <div class="estimate-content">
+          <!-- Summary card: Projection for upcoming month -->
+          <section class="estimate-summary-card">
+            <span class="currency-label" id="estimate-target-month"
+              >PROJECTION FOR NEXT MONTH</span
+            >
+            <div class="estimate-projected-balances">
+              <div class="est-balance-box">
+                <span class="est-curr-tag">USD</span>
+                <h3 id="est-projected-usd">$0.00</h3>
+                <span class="est-sub-detail" id="est-detail-usd"
+                  >Live $0.00 + Net $0.00</span
+                >
+              </div>
+              <div class="est-balance-box">
+                <span class="est-curr-tag">LBP</span>
+                <h3 id="est-projected-lbp">0 LBP</h3>
+                <span class="est-sub-detail" id="est-detail-lbp"
+                  >Live 0 + Net 0</span
+                >
+              </div>
+            </div>
+          </section>
+
+          <!-- Add / Edit Item Form -->
+          <section class="estimate-form-card">
+            <div class="estimate-form-header">
+              <h3 id="estimate-form-title">Add Expected Monthly Item</h3>
+              <button
+                type="button"
+                id="btn-cancel-edit-est"
+                class="btn-text"
+                style="display: none"
+              >
+                Cancel Edit
+              </button>
+            </div>
+
+            <form id="estimate-form">
+              <input type="hidden" id="estimate-edit-id" value="" />
+              <input type="hidden" id="estimate-edit-mode" value="permanent" />
+
+              <div class="estimate-type-selector">
+                <button
+                  type="button"
+                  class="btn-type-toggle active"
+                  data-type="expense"
+                >
+                  Expense (Outgoing)
+                </button>
+                <button
+                  type="button"
+                  class="btn-type-toggle"
+                  data-type="income"
+                >
+                  Income (Incoming)
+                </button>
+              </div>
+
+              <div class="amount-row" style="margin-top: 0.75rem">
+                <input
+                  type="text"
+                  id="estimate-note"
+                  placeholder="Note (e.g. Electrical bill, Salary)"
+                  class="note-input"
+                  required
+                />
+              </div>
+
+              <div class="amount-row">
+                <input
+                  type="text"
+                  inputmode="decimal"
+                  id="estimate-amount"
+                  class="amount-input"
+                  placeholder="0.00"
+                  required
+                />
+                <button
+                  type="button"
+                  id="estimate-curr-toggle"
+                  class="currency-toggle"
+                  data-currency="USD"
+                >
+                  USD
+                </button>
+              </div>
+
+              <div class="dialog-actions" style="margin-top: 0.75rem">
+                <button
+                  type="submit"
+                  id="btn-save-estimate-item"
+                  class="btn-primary"
+                  style="width: 100%"
+                >
+                  + Add Monthly Item
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- List of Items -->
+          <section class="estimate-list-section">
+            <div class="section-title-row">
+              <h3>Monthly Items</h3>
+              <span id="estimate-items-count" class="optional">0 items</span>
+            </div>
+            <ul id="estimate-items-list" class="tx-list">
+              <!-- Populated by JS -->
+            </ul>
+          </section>
+        </div>
+      </dialog>
 
       <dialog id="add-tx-dialog">
         <form id="add-tx-form">

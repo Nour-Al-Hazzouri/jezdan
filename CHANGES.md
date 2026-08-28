@@ -1,5 +1,27 @@
 # Changes
 
+## [Task 10] Monthly Balance Estimation
+
+- **Date**: 2026-08-28
+- **Technical Summary**: Implemented upcoming month balance estimation tool projecting dual-currency balances based on recurring monthly income and expenses, dynamically linked to live balances with month-scoped skip and temporary edit overrides.
+
+### Technical Log
+
+- **Modified**: `src/data/storage.js` — Added `KEYS.MONTHLY_ESTIMATES`, `getUpcomingMonthKey()`, `getMonthlyEstimates()`, `addMonthlyEstimate()`, `updateMonthlyEstimate()`, `deleteMonthlyEstimate()`, `toggleSkipMonthlyEstimate()`, `setMonthlyEstimateTempOverride()`, `clearMonthlyEstimateTempOverride()`, and `getEstimatedBalances()`. Updated `exportData()` and `importData()` to include `monthlyEstimates` in backups and triggered auto-backups on mutations.
+- **Modified**: `src/index.html` — Added secondary schedule FAB button (`#btn-open-estimate`) stacked vertically above the `+` FAB, and added `<dialog id="estimate-dialog" class="full-dialog">` with summary cards, item add/edit form, and scrollable recurring items list.
+- **New**: `src/ui/estimation.js` — Created estimation UI controller module handling dialog lifecycle, dynamic projection updates, month-scoped Skip/Unskip, Temp Edit override/undo, permanent Edit, and Delete actions.
+- **Modified**: `src/ui/styles.css` — Added styling for schedule FAB, projection card, breakdown metrics, segmented type toggle, item states (skipped/dimmed, temp override badges), and action buttons.
+- **Modified**: `src/index.js` — Imported and initialized `initEstimationUI()`.
+- **Modified**: `jezdan-task-breakdown.md` — Added Task 10 to status table and detailed breakdown section.
+- **New**: `test/estimation-check.js` — Added pure assert self-check testing key rollovers, live balance reactivity, month-scoped skip, and temp overrides.
+- **Why**: Allows users to forecast next month's cash flow in both USD and LBP based on recurring bills and income without modifying actual ledger entries, while reacting dynamically to live wallet changes.
+
+### Plain English Summary
+
+You can now tap the schedule (📅) button above the "+" button to open the Monthly Estimation screen. Here, you can add your recurring monthly income and bills (in USD or LBP). The app automatically projects your wallet balances for next month by taking your real-time cash balance and applying your upcoming monthly net totals. You can temporarily skip any bill for the upcoming month, apply a one-off temporary amount change for next month only, permanently edit recurring amounts, or delete items anytime.
+
+---
+
 ## [Feature] Offline Backup Retry Queue
 
 - **Date**: 2026-08-02

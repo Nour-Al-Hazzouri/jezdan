@@ -5,6 +5,7 @@ import { initAddTransactionUI } from "./ui/addTransaction.js";
 import { renderDashboard } from "./ui/dashboard.js";
 import { initHistoryUI } from "./ui/history.js";
 import { initSettingsUI } from "./ui/settings.js";
+import { initEstimationUI } from "./ui/estimation.js";
 
 import { processOfflineBackupQueue } from "./data/telegram.js";
 
@@ -16,6 +17,7 @@ window.Jezdan = { storage, calculation };
 initAddTransactionUI();
 initHistoryUI();
 initSettingsUI();
+initEstimationUI();
 renderDashboard();
 
 // Process any pending backups from offline usage
