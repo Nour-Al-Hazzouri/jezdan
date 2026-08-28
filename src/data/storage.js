@@ -222,15 +222,39 @@ export async function getMonthlyEstimates() {
   return await readData(KEYS.MONTHLY_ESTIMATES, []);
 }
 
+function getItemAmounts(item) {
+  if (Array.isArray(item.amounts) && item.amounts.length > 0) {
+    return item.amounts;
+  }
+  if (item.amount !== undefined && item.currency) {
+    return [{ amount: Number(item.amount) || 0, currency: item.currency }];
+  }
+  return [];
+}
+
 export async function addMonthlyEstimate(estimate) {
+  const amounts =
+    Array.isArray(estimate.amounts) && estimate.amounts.length > 0
+      ? estimate.amounts.map((a) => ({
+          amount: Number(a.amount) || 0,
+          currency: a.currency || "USD",
+        }))
+      : [
+          {
+            amount: Number(estimate.amount) || 0,
+            currency: estimate.currency || "USD",
+          },
+        ];
+
   const newEst = {
     id: generateId(),
     type: estimate.type || "expense",
     note: estimate.note || "",
-    amount: Number(estimate.amount) || 0,
-    currency: estimate.currency || "USD",
+    amounts,
+    amount: amounts[0]?.amount || 0,
+    currency: amounts[0]?.currency || "USD",
     skippedForMonth: null,
-    tempOverride: null, // { amount: number, month: string }
+    tempOverride: null, // { amounts: [{ amount, currency }], month: string }
   };
 
   const list = await getMonthlyEstimates();
@@ -245,13 +269,33 @@ export async function updateMonthlyEstimate(id, updated) {
   const idx = list.findIndex((e) => e.id === id);
   if (idx === -1) return null;
 
+  const amounts =
+    Array.isArray(updated.amounts) && updated.amounts.length > 0
+      ? updated.amounts.map((a) => ({
+          amount: Number(a.amount) || 0,
+          currency: a.currency || "USD",
+        }))
+      : updated.amount !== undefined
+        ? [
+            {
+              amount: Number(updated.amount) || 0,
+              currency: updated.currency || list[idx].currency || "USD",
+            },
+          ]
+        : list[idx].amounts || [
+            {
+              amount: Number(list[idx].amount) || 0,
+              currency: list[idx].currency || "USD",
+            },
+          ];
+
   list[idx] = {
     ...list[idx],
     type: updated.type || list[idx].type,
     note: updated.note !== undefined ? updated.note : list[idx].note,
-    amount:
-      updated.amount !== undefined ? Number(updated.amount) : list[idx].amount,
-    currency: updated.currency || list[idx].currency,
+    amounts,
+    amount: amounts[0]?.amount || 0,
+    currency: amounts[0]?.currency || "USD",
   };
 
   await writeData(KEYS.MONTHLY_ESTIMATES, list);
@@ -259,14 +303,27 @@ export async function updateMonthlyEstimate(id, updated) {
   return list[idx];
 }
 
-export async function setMonthlyEstimateTempOverride(id, tempAmount) {
+export async function setMonthlyEstimateTempOverride(id, tempAmounts) {
   const list = await getMonthlyEstimates();
   const item = list.find((e) => e.id === id);
   if (!item) return null;
 
   const targetMonth = getUpcomingMonthKey();
+  const amounts = Array.isArray(tempAmounts)
+    ? tempAmounts.map((a) => ({
+        amount: Number(a.amount) || 0,
+        currency: a.currency || "USD",
+      }))
+    : [
+        {
+          amount: Number(tempAmounts) || 0,
+          currency: item.amounts?.[0]?.currency || item.currency || "USD",
+        },
+      ];
+
   item.tempOverride = {
-    amount: Number(tempAmount) || 0,
+    amounts,
+    amount: amounts[0]?.amount || 0,
     month: targetMonth,
   };
 
@@ -325,22 +382,36 @@ export async function getEstimatedBalances() {
       continue;
     }
 
-    let effectiveAmount = est.amount;
+    let effectiveAmounts = [];
     if (est.tempOverride && est.tempOverride.month === targetMonth) {
-      effectiveAmount = est.tempOverride.amount;
+      if (Array.isArray(est.tempOverride.amounts)) {
+        effectiveAmounts = est.tempOverride.amounts;
+      } else if (est.tempOverride.amount !== undefined) {
+        effectiveAmounts = [
+          {
+            amount: est.tempOverride.amount,
+            currency: est.amounts?.[0]?.currency || est.currency || "USD",
+          },
+        ];
+      }
+    } else {
+      effectiveAmounts = getItemAmounts(est);
     }
 
-    if (est.currency === "USD") {
-      if (est.type === "income") {
-        incomeUSD += effectiveAmount;
-      } else {
-        expenseUSD += effectiveAmount;
-      }
-    } else if (est.currency === "LBP") {
-      if (est.type === "income") {
-        incomeLBP += effectiveAmount;
-      } else {
-        expenseLBP += effectiveAmount;
+    for (const a of effectiveAmounts) {
+      const amt = Number(a.amount) || 0;
+      if (a.currency === "USD") {
+        if (est.type === "income") {
+          incomeUSD += amt;
+        } else {
+          expenseUSD += amt;
+        }
+      } else if (a.currency === "LBP") {
+        if (est.type === "income") {
+          incomeLBP += amt;
+        } else {
+          expenseLBP += amt;
+        }
       }
     }
   }

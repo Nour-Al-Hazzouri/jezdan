@@ -21,7 +21,6 @@ function formatMoney(amount, currency) {
 }
 
 function formatTargetMonthName(monthKey) {
-  // monthKey is YYYY-MM
   const [yyyy, mm] = monthKey.split("-");
   const date = new Date(Number(yyyy), Number(mm) - 1, 1);
   return date.toLocaleDateString(undefined, {
@@ -42,6 +41,16 @@ function formatInputCommas(val) {
   return parts.join(".");
 }
 
+function getItemAmountsList(item) {
+  if (Array.isArray(item.amounts) && item.amounts.length > 0) {
+    return item.amounts;
+  }
+  if (item.amount !== undefined && item.currency) {
+    return [{ amount: Number(item.amount) || 0, currency: item.currency }];
+  }
+  return [];
+}
+
 export function initEstimationUI() {
   const dialog = document.getElementById("estimate-dialog");
   const btnOpen = document.getElementById("btn-open-estimate");
@@ -53,15 +62,14 @@ export function initEstimationUI() {
   const inputEditId = document.getElementById("estimate-edit-id");
   const inputEditMode = document.getElementById("estimate-edit-mode");
   const inputNote = document.getElementById("estimate-note");
-  const inputAmount = document.getElementById("estimate-amount");
-  const btnCurrToggle = document.getElementById("estimate-curr-toggle");
+  const amountsContainer = document.getElementById("estimate-amounts-rows");
+  const btnAddCurrRow = document.getElementById("btn-add-est-curr-row");
   const btnSubmit = document.getElementById("btn-save-estimate-item");
   const typeToggles = form.querySelectorAll(".btn-type-toggle");
 
   const listContainer = document.getElementById("estimate-items-list");
 
   let currentType = "expense";
-  let currentCurrency = "USD";
 
   function setType(type) {
     currentType = type;
@@ -70,48 +78,119 @@ export function initEstimationUI() {
     });
   }
 
-  function setCurrency(curr) {
-    currentCurrency = curr;
-    btnCurrToggle.dataset.currency = curr;
-    btnCurrToggle.textContent = curr;
-  }
-
   typeToggles.forEach((btn) => {
     btn.addEventListener("click", () => {
-      if (inputEditMode.value === "temp") return; // type is locked in temp edit
+      if (inputEditMode.value === "temp") return;
       setType(btn.dataset.type);
     });
   });
 
-  btnCurrToggle.addEventListener("click", () => {
-    if (inputEditMode.value === "temp") return; // currency is locked in temp edit
-    setCurrency(currentCurrency === "USD" ? "LBP" : "USD");
-  });
+  function toggleRowCurrency(btn) {
+    const current = btn.dataset.currency;
+    const next = current === "USD" ? "LBP" : "USD";
+    btn.dataset.currency = next;
+    btn.textContent = next;
+  }
 
-  inputAmount.addEventListener("input", function () {
-    const cursorPosition = this.selectionStart;
-    const oldLength = this.value.length;
-    const formatted = formatInputCommas(this.value);
-    this.value = formatted;
-    try {
-      const newCursor = cursorPosition + (formatted.length - oldLength);
-      this.setSelectionRange(newCursor, newCursor);
-    } catch (e) {}
-  });
+  function updateToggles(container) {
+    const rows = container.children;
+    if (rows.length === 2) {
+      const firstBtn = rows[0].querySelector(".currency-toggle");
+      const secondBtn = rows[1].querySelector(".currency-toggle");
+
+      const expectedSecond =
+        firstBtn.dataset.currency === "USD" ? "LBP" : "USD";
+
+      if (secondBtn.dataset.currency !== expectedSecond) {
+        secondBtn.dataset.currency = expectedSecond;
+        secondBtn.textContent = expectedSecond;
+      }
+
+      firstBtn.disabled = true;
+      secondBtn.disabled = true;
+      firstBtn.style.opacity = "0.7";
+      secondBtn.style.opacity = "0.7";
+    } else if (rows.length === 1) {
+      const firstBtn = rows[0].querySelector(".currency-toggle");
+      firstBtn.disabled = false;
+      firstBtn.style.opacity = "1";
+    }
+  }
+
+  function createAmountRow(
+    defaultCurrency = "USD",
+    isRequired = false,
+    defaultAmount = "",
+  ) {
+    const row = document.createElement("div");
+    row.className = "amount-row";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.inputMode = "decimal";
+    input.className = "amount-input";
+    input.placeholder = "0.00";
+    if (isRequired) input.required = true;
+
+    if (defaultAmount !== "") {
+      input.value = formatInputCommas(defaultAmount);
+    }
+
+    input.addEventListener("input", function () {
+      const cursorPosition = this.selectionStart;
+      const oldLength = this.value.length;
+      const formatted = formatInputCommas(this.value);
+      this.value = formatted;
+      try {
+        const newCursor = cursorPosition + (formatted.length - oldLength);
+        this.setSelectionRange(newCursor, newCursor);
+      } catch (e) {}
+    });
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "currency-toggle";
+    btn.dataset.currency = defaultCurrency;
+    btn.textContent = defaultCurrency;
+
+    btn.addEventListener("click", () => {
+      if (inputEditMode.value === "temp") return;
+      toggleRowCurrency(btn);
+    });
+
+    row.appendChild(input);
+    row.appendChild(btn);
+    return row;
+  }
 
   function resetForm() {
     form.reset();
     inputEditId.value = "";
     inputEditMode.value = "permanent";
     setType("expense");
-    setCurrency("USD");
     inputNote.disabled = false;
-    btnCurrToggle.disabled = false;
     typeToggles.forEach((b) => (b.disabled = false));
     formTitle.textContent = "Add Expected Monthly Item";
     btnSubmit.textContent = "+ Add Monthly Item";
     btnCancelEdit.style.display = "none";
+
+    amountsContainer.innerHTML = "";
+    amountsContainer.appendChild(createAmountRow("USD", true));
+    updateToggles(amountsContainer);
+    btnAddCurrRow.style.display = "inline-block";
   }
+
+  btnAddCurrRow.addEventListener("click", () => {
+    if (amountsContainer.children.length < 2) {
+      const firstCurr =
+        amountsContainer.children[0].querySelector(".currency-toggle").dataset
+          .currency;
+      const secondCurr = firstCurr === "USD" ? "LBP" : "USD";
+      amountsContainer.appendChild(createAmountRow(secondCurr, false));
+      updateToggles(amountsContainer);
+      btnAddCurrRow.style.display = "none";
+    }
+  });
 
   btnCancelEdit.addEventListener("click", () => {
     resetForm();
@@ -127,12 +206,30 @@ export function initEstimationUI() {
     dialog.close();
   });
 
+  function getFormAmounts() {
+    const results = [];
+    for (const row of amountsContainer.children) {
+      const input = row.querySelector(".amount-input");
+      const btn = row.querySelector(".currency-toggle");
+      if (input && input.value) {
+        const val = parseFloat(input.value.replace(/,/g, ""));
+        if (!isNaN(val) && val > 0) {
+          results.push({
+            amount: val,
+            currency: btn.dataset.currency || "USD",
+          });
+        }
+      }
+    }
+    return results;
+  }
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const note = inputNote.value.trim();
-    const amountVal = parseFloat(inputAmount.value.replace(/,/g, ""));
-    if (isNaN(amountVal) || amountVal <= 0) return;
+    const amounts = getFormAmounts();
+    if (amounts.length === 0) return;
 
     const editId = inputEditId.value;
     const editMode = inputEditMode.value;
@@ -142,19 +239,17 @@ export function initEstimationUI() {
       await addMonthlyEstimate({
         type: currentType,
         note,
-        amount: amountVal,
-        currency: currentCurrency,
+        amounts,
       });
     } else if (editMode === "temp") {
       // Month-scoped override
-      await setMonthlyEstimateTempOverride(editId, amountVal);
+      await setMonthlyEstimateTempOverride(editId, amounts);
     } else {
       // Permanent update
       await updateMonthlyEstimate(editId, {
         type: currentType,
         note,
-        amount: amountVal,
-        currency: currentCurrency,
+        amounts,
       });
     }
 
@@ -184,47 +279,77 @@ export function initEstimationUI() {
       if (!item) return;
 
       const targetMonth = getUpcomingMonthKey();
-      const currentOverride =
-        item.tempOverride && item.tempOverride.month === targetMonth
-          ? item.tempOverride.amount
-          : item.amount;
+      let activeAmounts = [];
+      if (item.tempOverride && item.tempOverride.month === targetMonth) {
+        activeAmounts = item.tempOverride.amounts || [
+          {
+            amount: item.tempOverride.amount,
+            currency: item.amounts?.[0]?.currency || item.currency || "USD",
+          },
+        ];
+      } else {
+        activeAmounts = getItemAmountsList(item);
+      }
 
       inputEditId.value = item.id;
       inputEditMode.value = "temp";
       inputNote.value = item.note;
       inputNote.disabled = true;
       setType(item.type);
-      setCurrency(item.currency);
-      btnCurrToggle.disabled = true;
       typeToggles.forEach((b) => (b.disabled = true));
-      inputAmount.value = formatInputCommas(currentOverride);
+
+      amountsContainer.innerHTML = "";
+      activeAmounts.forEach((a, idx) => {
+        amountsContainer.appendChild(
+          createAmountRow(a.currency, idx === 0, a.amount),
+        );
+      });
+      updateToggles(amountsContainer);
+      btnAddCurrRow.style.display =
+        amountsContainer.children.length < 2 ? "inline-block" : "none";
 
       formTitle.textContent = `⚡ Next Month Temp Edit (${formatTargetMonthName(targetMonth)})`;
       btnSubmit.textContent = "Save Temp Override";
       btnCancelEdit.style.display = "inline-block";
 
-      inputAmount.focus();
-      inputAmount.select();
+      const firstInput = amountsContainer.querySelector("input");
+      if (firstInput) {
+        firstInput.focus();
+        firstInput.select();
+      }
     } else if (action === "edit") {
       const estimates = await getMonthlyEstimates();
       const item = estimates.find((i) => i.id === id);
       if (!item) return;
+
+      const baseAmounts = getItemAmountsList(item);
 
       inputEditId.value = item.id;
       inputEditMode.value = "permanent";
       inputNote.value = item.note;
       inputNote.disabled = false;
       setType(item.type);
-      setCurrency(item.currency);
-      btnCurrToggle.disabled = false;
       typeToggles.forEach((b) => (b.disabled = false));
-      inputAmount.value = formatInputCommas(item.amount);
+
+      amountsContainer.innerHTML = "";
+      if (baseAmounts.length > 0) {
+        baseAmounts.forEach((a, idx) => {
+          amountsContainer.appendChild(
+            createAmountRow(a.currency, idx === 0, a.amount),
+          );
+        });
+      } else {
+        amountsContainer.appendChild(createAmountRow("USD", true));
+      }
+      updateToggles(amountsContainer);
+      btnAddCurrRow.style.display =
+        amountsContainer.children.length < 2 ? "inline-block" : "none";
 
       formTitle.textContent = "Edit Permanent Monthly Item";
       btnSubmit.textContent = "Update Permanent Item";
       btnCancelEdit.style.display = "inline-block";
 
-      inputAmount.focus();
+      inputNote.focus();
     } else if (action === "delete") {
       await deleteMonthlyEstimate(id);
       await renderEstimationDialog();
@@ -279,14 +404,24 @@ export async function renderEstimationDialog() {
     const isSkipped = item.skippedForMonth === data.upcomingMonthKey;
     const hasTempOverride =
       item.tempOverride && item.tempOverride.month === data.upcomingMonthKey;
-    const effectiveAmount = hasTempOverride
-      ? item.tempOverride.amount
-      : item.amount;
+
+    let activeAmounts = [];
+    if (hasTempOverride) {
+      activeAmounts = item.tempOverride.amounts || [
+        {
+          amount: item.tempOverride.amount,
+          currency: item.amounts?.[0]?.currency || item.currency || "USD",
+        },
+      ];
+    } else {
+      activeAmounts = getItemAmountsList(item);
+    }
+
+    const baseAmounts = getItemAmountsList(item);
 
     const li = document.createElement("li");
     li.className = `tx-item estimate-item ${isSkipped ? "item-skipped" : ""} ${hasTempOverride ? "item-temp-override" : ""}`;
 
-    const formattedAmount = formatMoney(effectiveAmount, item.currency);
     const amountPrefix = item.type === "income" ? "+" : "-";
     const amountClass = item.type === "income" ? "tx-positive" : "tx-negative";
 
@@ -294,8 +429,18 @@ export async function renderEstimationDialog() {
     if (isSkipped) {
       badgeHtml = `<span class="est-badge est-badge-skipped">🚫 Skipped for ${targetMonthName}</span>`;
     } else if (hasTempOverride) {
-      badgeHtml = `<span class="est-badge est-badge-temp">⚡ Temp for ${targetMonthName} (Base: ${formatMoney(item.amount, item.currency)})</span>`;
+      const baseStr = baseAmounts
+        .map((a) => formatMoney(a.amount, a.currency))
+        .join(" + ");
+      badgeHtml = `<span class="est-badge est-badge-temp">⚡ Temp for ${targetMonthName} (Base: ${baseStr})</span>`;
     }
+
+    const amountsHtml = activeAmounts
+      .map((a) => {
+        const cls = a.currency === "USD" ? "tx-net-usd" : "tx-net-lbp";
+        return `<span class="${cls} ${amountClass}">${amountPrefix}${formatMoney(a.amount, a.currency)}</span>`;
+      })
+      .join("");
 
     li.innerHTML = `
       <div class="tx-item-header">
@@ -307,9 +452,7 @@ export async function renderEstimationDialog() {
           ${badgeHtml}
         </div>
         <div class="tx-amounts">
-          <span class="${item.currency === "USD" ? "tx-net-usd" : "tx-net-lbp"} ${amountClass}">
-            ${amountPrefix}${formattedAmount}
-          </span>
+          ${amountsHtml}
         </div>
       </div>
       <div class="tx-actions est-actions">

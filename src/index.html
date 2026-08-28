@@ -128,24 +128,10 @@
                 />
               </div>
 
-              <div class="amount-row">
-                <input
-                  type="text"
-                  inputmode="decimal"
-                  id="estimate-amount"
-                  class="amount-input"
-                  placeholder="0.00"
-                  required
-                />
-                <button
-                  type="button"
-                  id="estimate-curr-toggle"
-                  class="currency-toggle"
-                  data-currency="USD"
-                >
-                  USD
-                </button>
-              </div>
+              <div id="estimate-amounts-rows" style="margin-top: 0.5rem"></div>
+              <button type="button" id="btn-add-est-curr-row" class="btn-text">
+                + Add mixed currency
+              </button>
 
               <div class="dialog-actions" style="margin-top: 0.75rem">
                 <button
