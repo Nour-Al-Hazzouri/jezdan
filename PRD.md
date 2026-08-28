@@ -71,6 +71,11 @@ Single form, opened via one prominent "+" button:
    - Set/edit opening balances for USD and LBP wallets.
    - Local JSON backup & restore export/import.
    - Optional Telegram Auto-Backup (Bot Token + Chat ID setup for instant cloud copy on every data mutation).
+5. **Monthly Estimation**:
+   - Secondary schedule button (📅) stacked above the "+" FAB.
+   - Upcoming month balance projection for USD & LBP wallets dynamically linked to live balances.
+   - Manage recurring income and expense items (supports single or mixed-currency entries).
+   - Month-scoped Skip/Unskip, Temporary Edit overrides for next month only, and permanent Edit/Delete.
 
 ### Explicitly OUT of scope for v1 (do not build, keep it lean)
 

@@ -20,6 +20,7 @@ Standard personal finance apps (like Cashew, YNAB, or pocket trackers) are not b
 - **Dual Wallet Tracking:** Automatically maintains and updates running balances for both your USD and LBP wallets.
 - **Enforced UI Constraints:** Intelligently prevents duplicate currency rows (e.g. locks currency inputs to ensure one USD and one LBP row when recording mixed entries).
 - **Monthly History View:** Organizes transactions month-by-month with monthly income vs. outcome totals.
+- **Upcoming Month Balance Estimation:** Forecast your upcoming month cash balances in USD and LBP based on expected income and recurring bills. Supports mixed-currency entries (e.g. $10 + 500,000 LBP), month-scoped skipping, and single-month temporary amount overrides without altering actual wallet ledger entries.
 - **Offline-First PWA:** Works 100% offline via Service Worker caching. Installable directly to your phone's home screen via "Add to Home Screen."
 - **Local-Only Privacy:** 100% client-side. All data is saved on-device via `IndexedDB` — no servers, no accounts, and no tracking.
 - **Data Export & Import:** Backup your entire transaction history to a dated, numbered `.json` file (`YYYY-MM-DD-NNN` format) and restore it at any time.
